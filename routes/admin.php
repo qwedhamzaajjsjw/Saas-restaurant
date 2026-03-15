@@ -24,12 +24,16 @@ Route::prefix('admin')
 
         // Restaurant management
         Route::resource('restaurants', RestaurantController::class);
+        Route::patch('restaurants/{restaurant}/toggle-status', [RestaurantController::class, 'toggleStatus'])
+             ->name('restaurants.toggle-status');
 
         // Subscription plans
         Route::resource('plans', PlanController::class);
 
         // User management
-        Route::resource('users', UserController::class);
+        Route::resource('users', UserController::class)->only(['index','show','destroy']);
+        Route::patch('users/{user}/toggle-status', [UserController::class, 'toggleStatus'])
+             ->name('users.toggle-status');
 
         // System settings
         Route::get('/settings',        [SettingController::class, 'index'])->name('settings.index');
