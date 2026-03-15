@@ -7,22 +7,26 @@ use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * Blocks access to the app if not yet installed.
- * Also blocks access to /install if already installed.
+ * Global middleware that enforces the installation state.
+ *
+ * - Not installed + hitting non-installer route  → redirect to /install
+ * - Already installed + hitting /install route   → redirect to /login
+ * - All other combinations                       → pass through
  */
 class CheckInstalled
 {
     public function handle(Request $request, Closure $next): Response
     {
-        $installed = file_exists(storage_path('installed.lock'));
+        $installed    = file_exists(storage_path('installed.lock'));
+        $isInstaller  = $request->is('install') || $request->is('install/*');
 
-        // User hits /install/* but app is already installed → redirect to login
-        if ($installed && $request->is('install') || $installed && $request->is('install/*')) {
+        // Already installed → block installer access
+        if ($installed && $isInstaller) {
             return redirect()->route('login');
         }
 
-        // User hits any non-install route but app is NOT installed → force installer
-        if (! $installed && ! $request->is('install') && ! $request->is('install/*')) {
+        // Not installed → force installer for all non-installer routes
+        if (! $installed && ! $isInstaller) {
             return redirect()->route('installer.index');
         }
 

@@ -25,8 +25,8 @@ Route::prefix('install')
         Route::post('/database',       [InstallerController::class, 'saveDatabase'])
              ->name('database.save');
 
-        // Step 3+4 – run migrations
-        Route::post('/migrate',        [InstallerController::class, 'migrate'])
+        // Step 3+4 – run migrations (GET: show result page after redirect from saveDatabase)
+        Route::get('/migrate',         [InstallerController::class, 'migrate'])
              ->name('migrate');
 
         // Step 5 – create super admin
