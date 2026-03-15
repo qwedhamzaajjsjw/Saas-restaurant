@@ -31,6 +31,8 @@ Route::prefix('dashboard')
 
         // Products
         Route::resource('products', ProductController::class);
+        Route::patch('products/{product}/toggle-available', [ProductController::class, 'toggleAvailable'])
+             ->name('products.toggle-available');
 
         // Orders
         Route::get('/orders',          [OrderController::class, 'index'])->name('orders.index');
