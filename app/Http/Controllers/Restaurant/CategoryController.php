@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Restaurant;
 use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Models\Menu;
+use App\Services\SubscriptionService;
 use Illuminate\Http\Request;
 
 class CategoryController extends Controller
@@ -22,6 +23,12 @@ class CategoryController extends Controller
 
     public function store(Request $request)
     {
+        // التحقق من حد التصنيفات في الخطة
+        $restaurant = auth()->user()->restaurant;
+        if (! app(SubscriptionService::class)->canAddCategory($restaurant)) {
+            return back()->with('error', 'You have reached the maximum number of categories allowed by your current plan. Please upgrade to add more categories.');
+        }
+
         $data = $request->validate([
             'menu_id'     => ['required', 'exists:menus,id'],
             'name'        => ['required', 'string', 'max:255'],

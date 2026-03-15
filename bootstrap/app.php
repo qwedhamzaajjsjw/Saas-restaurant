@@ -20,9 +20,10 @@ return Application::configure(basePath: dirname(__DIR__))
 
         // ── Named (route-level) middleware aliases ────────────────────────
         $middleware->alias([
-            'role'      => \App\Http\Middleware\RoleMiddleware::class,
-            'tenant'    => \App\Http\Middleware\TenantMiddleware::class,
-            'installed' => \App\Http\Middleware\CheckInstalled::class,
+            'role'         => \App\Http\Middleware\RoleMiddleware::class,
+            'tenant'       => \App\Http\Middleware\TenantMiddleware::class,
+            'installed'    => \App\Http\Middleware\CheckInstalled::class,
+            'subscription' => \App\Http\Middleware\CheckSubscription::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

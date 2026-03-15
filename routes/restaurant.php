@@ -7,6 +7,7 @@ use App\Http\Controllers\Restaurant\CategoryController;
 use App\Http\Controllers\Restaurant\ProductController;
 use App\Http\Controllers\Restaurant\OrderController;
 use App\Http\Controllers\Restaurant\SettingController;
+use App\Http\Controllers\Restaurant\SubscriptionController;
 
 /*
 |--------------------------------------------------------------------------
@@ -17,7 +18,7 @@ use App\Http\Controllers\Restaurant\SettingController;
 
 Route::prefix('dashboard')
     ->name('restaurant.')
-    ->middleware(['auth', 'role:restaurant_owner', 'installed', 'tenant'])
+    ->middleware(['auth', 'role:restaurant_owner', 'installed', 'tenant', 'subscription'])
     ->group(function () {
 
         // Dashboard
@@ -43,4 +44,8 @@ Route::prefix('dashboard')
         // Settings
         Route::get('/settings',        [SettingController::class, 'index'])->name('settings.index');
         Route::post('/settings',       [SettingController::class, 'update'])->name('settings.update');
+
+        // Subscription
+        Route::get('/subscription',         [SubscriptionController::class, 'show'])->name('subscription.show');
+        Route::get('/subscription/expired', [SubscriptionController::class, 'expired'])->name('subscription.expired');
     });

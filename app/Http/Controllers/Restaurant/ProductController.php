@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Restaurant;
 use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Models\Product;
+use App\Services\SubscriptionService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
@@ -37,6 +38,12 @@ class ProductController extends Controller
 
     public function store(Request $request)
     {
+        // التحقق من حد المنتجات في الخطة
+        $restaurant = auth()->user()->restaurant;
+        if (! app(SubscriptionService::class)->canAddProduct($restaurant)) {
+            return back()->with('error', 'You have reached the maximum number of products allowed by your current plan. Please upgrade to add more products.');
+        }
+
         $data = $request->validate([
             'category_id'      => ['required', 'exists:categories,id'],
             'name'             => ['required', 'string', 'max:255'],

@@ -40,6 +40,7 @@
             ['route'=>'restaurant.products.index',    'label'=>'Products',    'icon'=>'M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4'],
             ['route'=>'restaurant.orders.index',      'label'=>'Orders',      'icon'=>'M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z'],
             ['route'=>'restaurant.settings.index',    'label'=>'Settings',    'icon'=>'M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z M15 12a3 3 0 11-6 0 3 3 0 016 0z'],
+            ['route'=>'restaurant.subscription.show', 'label'=>'Subscription', 'icon'=>'M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z'],
         ];
         @endphp
 
@@ -63,6 +64,33 @@
             </a>
         @endforeach
     </nav>
+
+    {{-- Subscription status widget --}}
+    @php
+        $activeSub = auth()->user()->restaurant?->subscriptions()
+            ->with('plan')
+            ->where('status','active')
+            ->where(function($q){ $q->whereNull('ends_at')->orWhere('ends_at','>',now()); })
+            ->latest('starts_at')->first();
+    @endphp
+    @if($activeSub)
+    <div class="mx-3 mb-3 bg-orange-50 border border-orange-100 rounded-xl px-3 py-2.5">
+        <p class="text-xs font-bold text-orange-600 truncate">{{ $activeSub->plan->name }}</p>
+        @if($activeSub->ends_at)
+            @php $daysLeft = (int) now()->diffInDays($activeSub->ends_at, false); @endphp
+            <p class="text-xs text-gray-400 mt-0.5">
+                {{ $daysLeft > 0 ? $daysLeft.' days left' : 'Expired' }}
+            </p>
+        @else
+            <p class="text-xs text-gray-400 mt-0.5">Active</p>
+        @endif
+    </div>
+    @else
+    <div class="mx-3 mb-3 bg-red-50 border border-red-100 rounded-xl px-3 py-2.5">
+        <p class="text-xs font-bold text-red-600">No Active Plan</p>
+        <a href="{{ route('restaurant.subscription.expired') }}" class="text-xs text-red-400 hover:underline">View details</a>
+    </div>
+    @endif
 
     {{-- User info --}}
     <div class="p-4 border-t border-gray-100">

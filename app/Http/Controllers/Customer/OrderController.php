@@ -7,6 +7,7 @@ use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Restaurant;
 use App\Services\CartService;
+use App\Services\SubscriptionService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -24,6 +25,11 @@ class OrderController extends Controller
 
         if (! $restaurant->accepts_orders) {
             return back()->with('error', 'عذراً، المطعم لا يقبل طلبات حالياً.');
+        }
+
+        // التحقق من حد الطلبات الشهرية للخطة
+        if (! app(SubscriptionService::class)->canReceiveOrder($restaurant)) {
+            return back()->with('error', 'عذراً، هذا المطعم وصل إلى الحد الأقصى من الطلبات المسموح بها هذا الشهر.');
         }
 
         $cart = new CartService($slug);
