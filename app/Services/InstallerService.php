@@ -82,21 +82,23 @@ class InstallerService
             'APP_NAME=Laravel'            => 'APP_NAME="Restaurant SaaS"',
             'APP_ENV=local'               => 'APP_ENV=production',
             'APP_DEBUG=true'              => 'APP_DEBUG=false',
-            'APP_URL=http://localhost'    => 'APP_URL='.rtrim($data['app_url'] ?? 'http://localhost', '/'),
+            'APP_URL=http://localhost'     => 'APP_URL='.rtrim($data['app_url'] ?? 'http://localhost', '/'),
             'DB_CONNECTION=sqlite'        => 'DB_CONNECTION=mysql',
             'DB_HOST=127.0.0.1'           => 'DB_HOST='.($data['db_host'] ?? '127.0.0.1'),
             'DB_PORT=3306'                => 'DB_PORT='.($data['db_port'] ?? '3306'),
             'DB_DATABASE=laravel'         => 'DB_DATABASE='.($data['db_name'] ?? ''),
             'DB_USERNAME=root'            => 'DB_USERNAME='.($data['db_user'] ?? ''),
             'DB_PASSWORD='                => 'DB_PASSWORD='.($data['db_pass'] ?? ''),
+            'SESSION_DRIVER=file'         => 'SESSION_DRIVER=database',
+            'CACHE_STORE=file'            => 'CACHE_STORE=database',
+            'QUEUE_CONNECTION=sync'       => 'QUEUE_CONNECTION=database',
         ];
 
         $contents = str_replace(array_keys($map), array_values($map), $template);
 
-        // Remove SQLite-only lines
+        // Remove SQLite-only / DB_URL lines
         $lines = array_filter(explode("\n", $contents), function ($line) {
-            return ! str_starts_with(trim($line), '# DB_') &&
-                   ! str_contains($line, 'DB_URL=');
+            return ! str_contains($line, 'DB_URL=');
         });
 
         File::put(base_path('.env'), implode("\n", $lines));
