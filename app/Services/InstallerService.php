@@ -89,9 +89,8 @@ class InstallerService
             'DB_DATABASE=laravel'         => 'DB_DATABASE='.($data['db_name'] ?? ''),
             'DB_USERNAME=root'            => 'DB_USERNAME='.($data['db_user'] ?? ''),
             'DB_PASSWORD='                => 'DB_PASSWORD='.($data['db_pass'] ?? ''),
-            'SESSION_DRIVER=file'         => 'SESSION_DRIVER=database',
-            'CACHE_STORE=file'            => 'CACHE_STORE=database',
-            'QUEUE_CONNECTION=sync'       => 'QUEUE_CONNECTION=database',
+            // Keep SESSION/CACHE/QUEUE as file-based during install
+            // so the sessions table can be created first via migrations.
         ];
 
         $contents = str_replace(array_keys($map), array_values($map), $template);
@@ -117,10 +116,27 @@ class InstallerService
         try {
             Artisan::call('migrate', ['--force' => true]);
             $output = Artisan::output();
+
+            // Now that sessions/cache/jobs tables exist, switch drivers
+            $this->switchDriversToDatabase();
+
             return ['success' => true, 'output' => $output];
         } catch (\Throwable $e) {
             return ['success' => false, 'output' => $e->getMessage()];
         }
+    }
+
+    protected function switchDriversToDatabase(): void
+    {
+        $envPath = base_path('.env');
+        $contents = File::get($envPath);
+
+        $contents = preg_replace('/^SESSION_DRIVER=.*/m', 'SESSION_DRIVER=database', $contents);
+        $contents = preg_replace('/^CACHE_STORE=.*/m',    'CACHE_STORE=database',    $contents);
+        $contents = preg_replace('/^QUEUE_CONNECTION=.*/m', 'QUEUE_CONNECTION=database', $contents);
+
+        File::put($envPath, $contents);
+        Artisan::call('config:clear');
     }
 
     public function runSeeders(): array
