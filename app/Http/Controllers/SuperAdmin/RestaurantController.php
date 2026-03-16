@@ -149,6 +149,7 @@ class RestaurantController extends Controller
             'address'       => ['nullable', 'string', 'max:255'],
             'city'          => ['nullable', 'string', 'max:100'],
             'plan_id'       => ['required', 'exists:plans,id'],
+            'logo'          => ['nullable', 'image', 'max:2048'],
             'status'        => ['required', 'in:active,inactive,suspended'],
             'domain_type'   => ['required', 'in:subdomain,custom,none'],
             'subdomain'     => [
@@ -163,7 +164,7 @@ class RestaurantController extends Controller
             ],
         ]);
 
-        $restaurant->update([
+        $updateData = [
             'name'          => $data['name'],
             'email'         => $data['email']   ?? null,
             'phone'         => $data['phone']   ?? null,
@@ -173,7 +174,16 @@ class RestaurantController extends Controller
             'status'        => $data['status'],
             'subdomain'     => $data['domain_type'] === 'subdomain' ? ($data['subdomain'] ?? null) : null,
             'custom_domain' => $data['domain_type'] === 'custom'    ? ($data['custom_domain'] ?? null) : null,
-        ]);
+        ];
+
+        if ($request->hasFile('logo')) {
+            if ($restaurant->logo) {
+                Storage::disk('public')->delete($restaurant->logo);
+            }
+            $updateData['logo'] = $request->file('logo')->store('logos', 'public');
+        }
+
+        $restaurant->update($updateData);
 
         return redirect()->route('admin.restaurants.index')
             ->with('success', 'Restaurant updated successfully.');
