@@ -16,6 +16,7 @@ class Restaurant extends Model
         'name',
         'slug',
         'custom_domain',
+        'subdomain',
         'description',
         'logo',
         'cover_image',
@@ -51,6 +52,24 @@ class Restaurant extends Model
     public function isActive(): bool
     {
         return $this->status === 'active';
+    }
+
+    /**
+     * Returns the public-facing URL for this restaurant's storefront.
+     * Priority: custom_domain > subdomain > path-based slug URL.
+     */
+    public function getStorefrontUrlAttribute(): string
+    {
+        if ($this->custom_domain) {
+            return 'https://' . $this->custom_domain;
+        }
+
+        if ($this->subdomain) {
+            $appHost = parse_url(config('app.url'), PHP_URL_HOST);
+            return 'https://' . $this->subdomain . '.' . $appHost;
+        }
+
+        return route('customer.index', ['slug' => $this->slug]);
     }
 
     public function getLogoUrlAttribute(): string

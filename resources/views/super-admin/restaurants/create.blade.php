@@ -15,6 +15,7 @@
         <form method="POST" action="{{ route('admin.restaurants.store') }}" class="space-y-6">
             @csrf
 
+            {{-- ── Basic Info ──────────────────────────────────────────── --}}
             <div class="grid grid-cols-2 gap-4">
                 <div class="col-span-2">
                     <label class="block text-sm font-medium text-gray-700 mb-1.5">Restaurant Name *</label>
@@ -51,6 +52,75 @@
                 </div>
             </div>
 
+            {{-- ── Domain Assignment ───────────────────────────────────── --}}
+            <hr class="border-gray-100">
+            <h3 class="text-sm font-semibold text-gray-700">Domain Assignment</h3>
+            <p class="text-xs text-gray-400 -mt-4">Choose how the restaurant's storefront will be accessed by customers.</p>
+
+            {{-- Domain Type Tabs --}}
+            <div class="flex rounded-xl border border-gray-200 overflow-hidden" id="domain-tabs">
+                <button type="button" data-type="subdomain"
+                        class="domain-tab flex-1 py-2.5 text-sm font-medium transition
+                               {{ old('domain_type','subdomain') === 'subdomain' ? 'bg-orange-500 text-white' : 'bg-white text-gray-500 hover:bg-gray-50' }}">
+                    Subdomain
+                    <span class="block text-xs font-normal opacity-75">pizza.yourdomain.com</span>
+                </button>
+                <button type="button" data-type="custom"
+                        class="domain-tab flex-1 py-2.5 text-sm font-medium border-l border-gray-200 transition
+                               {{ old('domain_type') === 'custom' ? 'bg-orange-500 text-white' : 'bg-white text-gray-500 hover:bg-gray-50' }}">
+                    Custom Domain
+                    <span class="block text-xs font-normal opacity-75">pizza-palace.com</span>
+                </button>
+                <button type="button" data-type="none"
+                        class="domain-tab flex-1 py-2.5 text-sm font-medium border-l border-gray-200 transition
+                               {{ old('domain_type') === 'none' ? 'bg-orange-500 text-white' : 'bg-white text-gray-500 hover:bg-gray-50' }}">
+                    No Domain
+                    <span class="block text-xs font-normal opacity-75">yourdomain.com/restaurant/slug</span>
+                </button>
+            </div>
+            <input type="hidden" name="domain_type" id="domain_type" value="{{ old('domain_type','subdomain') }}">
+
+            {{-- Subdomain Panel --}}
+            <div id="panel-subdomain" class="domain-panel {{ old('domain_type','subdomain') !== 'subdomain' ? 'hidden' : '' }}">
+                <label class="block text-sm font-medium text-gray-700 mb-1.5">Subdomain Prefix *</label>
+                <div class="flex items-center border rounded-xl overflow-hidden focus-within:ring-2 focus-within:ring-orange-400 {{ $errors->has('subdomain') ? 'border-red-400' : 'border-gray-300' }}">
+                    <input type="text" name="subdomain" id="subdomain_input"
+                           value="{{ old('subdomain') }}"
+                           placeholder="pizza"
+                           class="flex-1 px-4 py-2.5 text-sm outline-none bg-white">
+                    <span class="px-3 py-2.5 bg-gray-50 text-gray-400 text-sm border-l border-gray-200 whitespace-nowrap">
+                        .{{ parse_url(config('app.url'), PHP_URL_HOST) }}
+                    </span>
+                </div>
+                @error('subdomain')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
+                <p class="text-xs text-gray-400 mt-1">
+                    Lowercase letters, numbers and hyphens only. Make sure you have a wildcard DNS record
+                    <code class="bg-gray-100 px-1 rounded">*.{{ parse_url(config('app.url'), PHP_URL_HOST) }} → Server IP</code>
+                </p>
+            </div>
+
+            {{-- Custom Domain Panel --}}
+            <div id="panel-custom" class="domain-panel {{ old('domain_type') !== 'custom' ? 'hidden' : '' }}">
+                <label class="block text-sm font-medium text-gray-700 mb-1.5">Custom Domain *</label>
+                <input type="text" name="custom_domain" id="custom_domain_input"
+                       value="{{ old('custom_domain') }}"
+                       placeholder="pizza-palace.com"
+                       class="w-full border rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400 {{ $errors->has('custom_domain') ? 'border-red-400' : 'border-gray-300' }}">
+                @error('custom_domain')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
+                <p class="text-xs text-gray-400 mt-1">
+                    The restaurant owner must point their domain's A record to your server IP before this works.
+                </p>
+            </div>
+
+            {{-- No Domain Panel --}}
+            <div id="panel-none" class="domain-panel {{ old('domain_type') !== 'none' ? 'hidden' : '' }}">
+                <div class="bg-gray-50 rounded-xl px-4 py-3 text-sm text-gray-500">
+                    The restaurant will be accessible at:
+                    <code class="text-orange-600 ml-1">{{ config('app.url') }}/restaurant/&lt;slug&gt;</code>
+                </div>
+            </div>
+
+            {{-- ── Owner Account ───────────────────────────────────────── --}}
             <hr class="border-gray-100">
             <h3 class="text-sm font-semibold text-gray-700">Owner Account</h3>
 
@@ -88,4 +158,40 @@
         </form>
     </div>
 </div>
+
+<script>
+(function () {
+    const tabs   = document.querySelectorAll('.domain-tab');
+    const panels = document.querySelectorAll('.domain-panel');
+    const input  = document.getElementById('domain_type');
+
+    tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            const type = tab.dataset.type;
+            input.value = type;
+
+            // Style tabs
+            tabs.forEach(t => {
+                t.classList.remove('bg-orange-500', 'text-white');
+                t.classList.add('bg-white', 'text-gray-500');
+            });
+            tab.classList.add('bg-orange-500', 'text-white');
+            tab.classList.remove('bg-white', 'text-gray-500');
+
+            // Show/hide panels
+            panels.forEach(p => p.classList.add('hidden'));
+            document.getElementById('panel-' + type).classList.remove('hidden');
+
+            // Clear unused inputs so they don't get validated
+            document.getElementById('subdomain_input').required    = (type === 'subdomain');
+            document.getElementById('custom_domain_input').required = (type === 'custom');
+        });
+    });
+
+    // Set initial required state
+    const current = input.value;
+    document.getElementById('subdomain_input').required    = (current === 'subdomain');
+    document.getElementById('custom_domain_input').required = (current === 'custom');
+})();
+</script>
 @endsection

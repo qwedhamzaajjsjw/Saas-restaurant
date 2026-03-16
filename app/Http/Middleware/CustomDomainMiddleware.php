@@ -8,42 +8,65 @@ use Symfony\Component\HttpFoundation\Response;
 use App\Models\Restaurant;
 
 /**
- * Detects a restaurant from its custom domain and injects the slug
- * into the route so existing controllers work without modification.
+ * Resolves a restaurant from the incoming Host header.
  *
- * Flow:
- *  1. Read the incoming HTTP Host header.
- *  2. Strip www. prefix if present.
- *  3. Look up the restaurants table by custom_domain.
- *  4. Bind the found restaurant's slug into the request attributes
- *     and into the route parameters so downstream controllers
- *     receive it as the {slug} parameter.
+ * Supports two domain modes:
+ *
+ *  1. Custom domain  → pizza-palace.com          (stored in custom_domain)
+ *  2. Subdomain      → pizza.yourdomain.com       (stored in subdomain)
+ *
+ * Once resolved the restaurant model and its slug are injected into the
+ * request attributes and route parameters so existing controllers work
+ * without modification.
  */
 class CustomDomainMiddleware
 {
     public function handle(Request $request, Closure $next): Response
     {
         $host = strtolower($request->getHost());
-        // Strip www.
         $host = preg_replace('/^www\./', '', $host);
 
-        $restaurant = Restaurant::where('custom_domain', $host)
-            ->where('status', 'active')
-            ->first();
+        $restaurant = $this->resolveRestaurant($host);
 
         if (! $restaurant) {
             abort(404, 'Restaurant not found for this domain.');
         }
 
-        // Make the slug available to controllers via the request
         $request->attributes->set('restaurant', $restaurant);
         $request->attributes->set('slug', $restaurant->slug);
 
-        // Inject into route parameters so {slug} is resolved automatically
         if ($route = $request->route()) {
             $route->setParameter('slug', $restaurant->slug);
         }
 
         return $next($request);
+    }
+
+    private function resolveRestaurant(string $host): ?Restaurant
+    {
+        // 1. Exact custom-domain match (e.g. pizza-palace.com)
+        $restaurant = Restaurant::where('custom_domain', $host)
+            ->where('status', 'active')
+            ->first();
+
+        if ($restaurant) {
+            return $restaurant;
+        }
+
+        // 2. Subdomain match: strip the main app host and check the prefix
+        $appHost = strtolower(parse_url(config('app.url'), PHP_URL_HOST) ?? '');
+        $appHost = preg_replace('/^www\./', '', $appHost);
+
+        if ($appHost && str_ends_with($host, '.' . $appHost)) {
+            $prefix = substr($host, 0, strlen($host) - strlen('.' . $appHost));
+
+            if ($prefix !== '' && ! str_contains($prefix, '.')) {
+                $restaurant = Restaurant::where('subdomain', $prefix)
+                    ->where('status', 'active')
+                    ->first();
+            }
+        }
+
+        return $restaurant;
     }
 }

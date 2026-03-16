@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rule;
 
 class RestaurantController extends Controller
 {
@@ -54,6 +55,19 @@ class RestaurantController extends Controller
             'address'        => ['nullable', 'string', 'max:255'],
             'city'           => ['nullable', 'string', 'max:100'],
             'plan_id'        => ['required', 'exists:plans,id'],
+            'domain_type'    => ['required', 'in:subdomain,custom,none'],
+            'subdomain'      => [
+                'nullable', 'string', 'max:63',
+                'regex:/^[a-z0-9][a-z0-9\-]*[a-z0-9]$|^[a-z0-9]$/',
+                Rule::unique('restaurants', 'subdomain'),
+                Rule::requiredIf($request->domain_type === 'subdomain'),
+            ],
+            'custom_domain'  => [
+                'nullable', 'string', 'max:253',
+                'regex:/^([a-z0-9]+(-[a-z0-9]+)*\.)+[a-z]{2,}$/i',
+                Rule::unique('restaurants', 'custom_domain'),
+                Rule::requiredIf($request->domain_type === 'custom'),
+            ],
             // حساب المالك
             'owner_name'     => ['required', 'string', 'max:255'],
             'owner_email'    => ['required', 'email', 'unique:users,email'],
@@ -61,19 +75,19 @@ class RestaurantController extends Controller
         ]);
 
         DB::transaction(function () use ($data) {
-            // إنشاء المطعم
             $restaurant = Restaurant::create([
-                'name'    => $data['name'],
-                'slug'    => Str::slug($data['name']).'-'.Str::random(4),
-                'email'   => $data['email']  ?? null,
-                'phone'   => $data['phone']  ?? null,
-                'address' => $data['address'] ?? null,
-                'city'    => $data['city']    ?? null,
-                'plan_id' => $data['plan_id'],
-                'status'  => 'active',
+                'name'          => $data['name'],
+                'slug'          => Str::slug($data['name']).'-'.Str::random(4),
+                'email'         => $data['email']   ?? null,
+                'phone'         => $data['phone']   ?? null,
+                'address'       => $data['address'] ?? null,
+                'city'          => $data['city']    ?? null,
+                'plan_id'       => $data['plan_id'],
+                'status'        => 'active',
+                'subdomain'     => $data['domain_type'] === 'subdomain' ? ($data['subdomain'] ?? null) : null,
+                'custom_domain' => $data['domain_type'] === 'custom'    ? ($data['custom_domain'] ?? null) : null,
             ]);
 
-            // إنشاء حساب المالك
             User::create([
                 'name'              => $data['owner_name'],
                 'email'             => $data['owner_email'],
@@ -84,7 +98,6 @@ class RestaurantController extends Controller
                 'email_verified_at' => now(),
             ]);
 
-            // إنشاء اشتراك مجاني مبدئي
             Subscription::create([
                 'restaurant_id' => $restaurant->id,
                 'plan_id'       => $data['plan_id'],
@@ -121,16 +134,37 @@ class RestaurantController extends Controller
     public function update(Request $request, Restaurant $restaurant)
     {
         $data = $request->validate([
-            'name'    => ['required', 'string', 'max:255'],
-            'email'   => ['nullable', 'email'],
-            'phone'   => ['nullable', 'string', 'max:20'],
-            'address' => ['nullable', 'string', 'max:255'],
-            'city'    => ['nullable', 'string', 'max:100'],
-            'plan_id' => ['required', 'exists:plans,id'],
-            'status'  => ['required', 'in:active,inactive,suspended'],
+            'name'          => ['required', 'string', 'max:255'],
+            'email'         => ['nullable', 'email'],
+            'phone'         => ['nullable', 'string', 'max:20'],
+            'address'       => ['nullable', 'string', 'max:255'],
+            'city'          => ['nullable', 'string', 'max:100'],
+            'plan_id'       => ['required', 'exists:plans,id'],
+            'status'        => ['required', 'in:active,inactive,suspended'],
+            'domain_type'   => ['required', 'in:subdomain,custom,none'],
+            'subdomain'     => [
+                'nullable', 'string', 'max:63',
+                'regex:/^[a-z0-9][a-z0-9\-]*[a-z0-9]$|^[a-z0-9]$/',
+                Rule::unique('restaurants', 'subdomain')->ignore($restaurant->id),
+            ],
+            'custom_domain' => [
+                'nullable', 'string', 'max:253',
+                'regex:/^([a-z0-9]+(-[a-z0-9]+)*\.)+[a-z]{2,}$/i',
+                Rule::unique('restaurants', 'custom_domain')->ignore($restaurant->id),
+            ],
         ]);
 
-        $restaurant->update($data);
+        $restaurant->update([
+            'name'          => $data['name'],
+            'email'         => $data['email']   ?? null,
+            'phone'         => $data['phone']   ?? null,
+            'address'       => $data['address'] ?? null,
+            'city'          => $data['city']    ?? null,
+            'plan_id'       => $data['plan_id'],
+            'status'        => $data['status'],
+            'subdomain'     => $data['domain_type'] === 'subdomain' ? ($data['subdomain'] ?? null) : null,
+            'custom_domain' => $data['domain_type'] === 'custom'    ? ($data['custom_domain'] ?? null) : null,
+        ]);
 
         return redirect()->route('admin.restaurants.index')
             ->with('success', 'Restaurant updated successfully.');
@@ -144,7 +178,6 @@ class RestaurantController extends Controller
             ->with('success', 'Restaurant deleted.');
     }
 
-    // ── تعليق / تفعيل المطعم ─────────────────────────────────────────
     public function toggleStatus(Restaurant $restaurant)
     {
         $restaurant->update([
