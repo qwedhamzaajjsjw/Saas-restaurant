@@ -70,7 +70,11 @@ INSTALL_DIR="${HOME_DIR}/restaurant"
 PUBLIC_HTML=""
 
 # محاولة إيجاد public_html تلقائياً
-if [ -d "${HOME_DIR}/domains" ]; then
+if [ -d "${HOME_DIR}/public_html" ]; then
+    # Hostinger shared hosting (public_html مباشرة في home)
+    PUBLIC_HTML="${HOME_DIR}/public_html"
+elif [ -d "${HOME_DIR}/domains" ]; then
+    # Hostinger VPS أو نمط domains/
     FIRST_DOMAIN=$(ls "${HOME_DIR}/domains" | head -1)
     if [ -n "$FIRST_DOMAIN" ]; then
         PUBLIC_HTML="${HOME_DIR}/domains/${FIRST_DOMAIN}/public_html"
