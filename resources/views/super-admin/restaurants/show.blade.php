@@ -36,7 +36,7 @@
             </div>
             <div class="flex gap-2 flex-wrap justify-end">
                 {{-- Dashboard Button --}}
-                <a href="{{ route('restaurant.login') }}"
+                <a href="{{ route('admin.restaurants.login-as', $restaurant) }}"
                    class="inline-flex items-center gap-1.5 bg-orange-500 hover:bg-orange-600 text-white text-sm font-medium px-4 py-2 rounded-xl transition">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"

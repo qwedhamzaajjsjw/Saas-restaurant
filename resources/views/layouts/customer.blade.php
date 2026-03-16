@@ -12,7 +12,7 @@
         $metaKeys  = \App\Models\Setting::get('meta_keywords', null, $rid);
     @endphp
 
-    <title>{{ $metaTitle ?: (@yield('title', $restaurant->name)) }}</title>
+    <title>{{ $metaTitle ?: ($restaurant->name) }}</title>
     @if($metaDesc)  <meta name="description" content="{{ $metaDesc }}"> @endif
     @if($metaKeys)  <meta name="keywords"    content="{{ $metaKeys }}"> @endif
 

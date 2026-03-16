@@ -90,8 +90,8 @@
                 <td class="px-6 py-4">
                     <div class="flex items-center gap-1.5 justify-end flex-wrap">
                         {{-- Dashboard --}}
-                        <a href="{{ route('restaurant.login') }}"
-                           title="Restaurant Dashboard Login"
+                        <a href="{{ route('admin.restaurants.login-as', $restaurant) }}"
+                           title="Access Restaurant Dashboard"
                            class="inline-flex items-center gap-1 text-xs bg-orange-50 text-orange-600 hover:bg-orange-100 border border-orange-200 px-2.5 py-1.5 rounded-lg font-medium transition">
                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"

@@ -14,6 +14,11 @@ use App\Http\Controllers\SuperAdmin\SettingController;
 |--------------------------------------------------------------------------
 */
 
+// Stop impersonation — accessible by any authenticated user who has the session key
+Route::get('/admin/impersonate/stop', [RestaurantController::class, 'stopImpersonating'])
+     ->name('admin.impersonate.stop')
+     ->middleware(['auth', 'installed']);
+
 Route::prefix('admin')
     ->name('admin.')
     ->middleware(['auth', 'role:super_admin', 'installed'])
@@ -26,6 +31,8 @@ Route::prefix('admin')
         Route::resource('restaurants', RestaurantController::class);
         Route::patch('restaurants/{restaurant}/toggle-status', [RestaurantController::class, 'toggleStatus'])
              ->name('restaurants.toggle-status');
+        Route::get('restaurants/{restaurant}/login-as', [RestaurantController::class, 'loginAs'])
+             ->name('restaurants.login-as');
 
         // Subscription plans
         Route::resource('plans', PlanController::class);

@@ -8,6 +8,7 @@ use App\Models\Subscription;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
@@ -204,5 +205,50 @@ class RestaurantController extends Controller
         ]);
 
         return back()->with('success', 'Restaurant status updated.');
+    }
+
+    /**
+     * Impersonate a restaurant owner — super admin can access the restaurant dashboard.
+     */
+    public function loginAs(Restaurant $restaurant)
+    {
+        $owner = $restaurant->users()->where('role', 'restaurant_owner')->first();
+
+        if (! $owner) {
+            return back()->with('error', 'This restaurant has no owner account yet.');
+        }
+
+        // Store the original admin ID so we can return
+        session(['impersonating_admin_id' => auth()->id()]);
+
+        Auth::login($owner);
+
+        return redirect()->route('restaurant.dashboard')
+            ->with('success', 'Now viewing as '.$restaurant->name);
+    }
+
+    /**
+     * Stop impersonation and return to super admin session.
+     */
+    public function stopImpersonating()
+    {
+        $adminId = session('impersonating_admin_id');
+
+        if (! $adminId) {
+            return redirect()->route('admin.dashboard');
+        }
+
+        $admin = User::find($adminId);
+
+        if (! $admin || $admin->role !== 'super_admin') {
+            return redirect()->route('login');
+        }
+
+        session()->forget('impersonating_admin_id');
+
+        Auth::login($admin);
+
+        return redirect()->route('admin.dashboard')
+            ->with('success', 'Returned to admin panel.');
     }
 }

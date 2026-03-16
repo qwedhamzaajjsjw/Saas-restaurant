@@ -7,7 +7,22 @@
     <title>@yield('title', 'Dashboard') — {{ auth()->user()->restaurant->name ?? 'Restaurant' }}</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gray-100 flex h-screen overflow-hidden font-sans">
+<body class="bg-gray-100 {{ session('impersonating_admin_id') ? 'pt-10' : '' }} flex h-screen overflow-hidden font-sans">
+
+{{-- ── Impersonation Banner ─────────────────────────────────────────── --}}
+@if(session('impersonating_admin_id'))
+<div class="fixed top-0 left-0 right-0 z-50 bg-purple-600 text-white text-xs text-center py-2 flex items-center justify-center gap-4">
+    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M15 12a3 3 0 11-6 0 3 3 0 016 0z M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+    </svg>
+    <span>You are currently viewing as <strong>{{ auth()->user()->restaurant?->name ?? auth()->user()->name }}</strong> (Super Admin Preview)</span>
+    <a href="{{ route('admin.impersonate.stop') }}"
+       class="bg-white text-purple-700 font-bold px-3 py-0.5 rounded-full hover:bg-purple-50 transition ml-2">
+        ← Return to Admin
+    </a>
+</div>
+@endif
 
 {{-- ── Sidebar ──────────────────────────────────────────────────────── --}}
 <aside class="w-64 bg-white border-r border-gray-200 flex flex-col flex-shrink-0 shadow-sm">
