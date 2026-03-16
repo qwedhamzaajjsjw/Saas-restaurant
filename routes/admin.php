@@ -7,6 +7,8 @@ use App\Http\Controllers\SuperAdmin\PlanController;
 use App\Http\Controllers\SuperAdmin\UserController;
 use App\Http\Controllers\SuperAdmin\SettingController;
 
+use App\Http\Controllers\SuperAdmin\ImpersonateDashboardController;
+
 /*
 |--------------------------------------------------------------------------
 | Super Admin Routes
@@ -14,10 +16,15 @@ use App\Http\Controllers\SuperAdmin\SettingController;
 |--------------------------------------------------------------------------
 */
 
-// Stop impersonation — accessible by any authenticated user who has the session key
+// Stop impersonation — accessible by any authenticated super admin
 Route::get('/admin/impersonate/stop', [RestaurantController::class, 'stopImpersonating'])
      ->name('admin.impersonate.stop')
-     ->middleware(['auth', 'installed']);
+     ->middleware(['auth', 'installed', 'role:super_admin']);
+
+// Impersonation dashboard — view restaurant dashboard as super admin
+Route::get('/admin/restaurants/{restaurant}/preview', [ImpersonateDashboardController::class, 'show'])
+     ->name('admin.restaurants.impersonate.dashboard')
+     ->middleware(['auth', 'installed', 'role:super_admin']);
 
 Route::prefix('admin')
     ->name('admin.')

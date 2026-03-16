@@ -209,22 +209,19 @@ class RestaurantController extends Controller
 
     /**
      * Impersonate a restaurant owner — super admin can access the restaurant dashboard.
+     * Instead of switching users, we store the restaurant context in the session
+     * and keep the super admin logged in (avoids session regeneration issues).
      */
     public function loginAs(Restaurant $restaurant)
     {
-        $owner = $restaurant->users()->where('role', 'restaurant_owner')->first();
+        // Store impersonation context
+        session([
+            'impersonating_restaurant_id'   => $restaurant->id,
+            'impersonating_restaurant_name' => $restaurant->name,
+        ]);
 
-        if (! $owner) {
-            return back()->with('error', 'This restaurant has no owner account yet.');
-        }
-
-        // Store the original admin ID so we can return
-        session(['impersonating_admin_id' => auth()->id()]);
-
-        Auth::login($owner);
-
-        return redirect()->route('restaurant.dashboard')
-            ->with('success', 'Now viewing as '.$restaurant->name);
+        return redirect()->route('admin.restaurants.impersonate.dashboard', $restaurant)
+            ->with('success', 'Now previewing: '.$restaurant->name);
     }
 
     /**
@@ -232,21 +229,7 @@ class RestaurantController extends Controller
      */
     public function stopImpersonating()
     {
-        $adminId = session('impersonating_admin_id');
-
-        if (! $adminId) {
-            return redirect()->route('admin.dashboard');
-        }
-
-        $admin = User::find($adminId);
-
-        if (! $admin || $admin->role !== 'super_admin') {
-            return redirect()->route('login');
-        }
-
-        session()->forget('impersonating_admin_id');
-
-        Auth::login($admin);
+        session()->forget(['impersonating_restaurant_id', 'impersonating_restaurant_name']);
 
         return redirect()->route('admin.dashboard')
             ->with('success', 'Returned to admin panel.');
