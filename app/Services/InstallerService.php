@@ -76,31 +76,38 @@ class InstallerService
 
     public function writeEnvFile(array $data): bool
     {
-        $template = File::get(base_path('.env.example'));
+        // Read the current .env (already created/seeded by public/index.php pre-boot)
+        // Fall back to .env.example if somehow .env is still missing.
+        $envPath  = base_path('.env');
+        $template = File::exists($envPath)
+            ? File::get($envPath)
+            : File::get(base_path('.env.example'));
 
         $appName = $data['app_name'] ?? 'Restaurant SaaS';
+        $appUrl  = rtrim($data['app_url'] ?? request()->root(), '/');
+
         $map = [
-            'APP_NAME=Laravel'            => 'APP_NAME="'.str_replace('"', '\\"', $appName).'"',
-            'APP_ENV=local'               => 'APP_ENV=production',
-            'APP_DEBUG=true'              => 'APP_DEBUG=false',
-            'APP_URL=http://localhost'     => 'APP_URL='.rtrim($data['app_url'] ?? 'http://localhost', '/'),
-            'APP_TIMEZONE=UTC'            => 'APP_TIMEZONE='.($data['timezone'] ?? 'UTC'),
-            'DB_CONNECTION=sqlite'        => 'DB_CONNECTION=mysql',
-            'DB_HOST=127.0.0.1'           => 'DB_HOST='.($data['db_host'] ?? '127.0.0.1'),
-            'DB_PORT=3306'                => 'DB_PORT='.($data['db_port'] ?? '3306'),
-            'DB_DATABASE=laravel'         => 'DB_DATABASE='.($data['db_name'] ?? ''),
-            'DB_USERNAME=root'            => 'DB_USERNAME='.($data['db_user'] ?? ''),
-            'DB_PASSWORD='                => 'DB_PASSWORD='.($data['db_pass'] ?? ''),
-            // Keep SESSION/CACHE/QUEUE as file-based during install
-            // so the sessions table can be created first via migrations.
+            '/^APP_NAME=.*$/m'        => 'APP_NAME="'.str_replace('"', '\\"', $appName).'"',
+            '/^APP_ENV=.*$/m'         => 'APP_ENV=production',
+            '/^APP_DEBUG=.*$/m'       => 'APP_DEBUG=false',
+            '/^APP_URL=.*$/m'         => 'APP_URL='.$appUrl,
+            '/^APP_TIMEZONE=.*$/m'    => 'APP_TIMEZONE='.($data['timezone'] ?? 'UTC'),
+            '/^DB_CONNECTION=.*$/m'   => 'DB_CONNECTION=mysql',
+            '/^DB_HOST=.*$/m'         => 'DB_HOST='.($data['db_host'] ?? '127.0.0.1'),
+            '/^DB_PORT=.*$/m'         => 'DB_PORT='.($data['db_port'] ?? '3306'),
+            '/^DB_DATABASE=.*$/m'     => 'DB_DATABASE='.($data['db_name'] ?? ''),
+            '/^DB_USERNAME=.*$/m'     => 'DB_USERNAME='.($data['db_user'] ?? ''),
+            '/^DB_PASSWORD=.*$/m'     => 'DB_PASSWORD='.($data['db_pass'] ?? ''),
         ];
 
-        $contents = str_replace(array_keys($map), array_values($map), $template);
+        // Apply regex replacements (handles any existing value, not just defaults)
+        $contents = $template;
+        foreach ($map as $pattern => $replacement) {
+            $contents = preg_replace($pattern, $replacement, $contents);
+        }
 
         // Remove SQLite-only / DB_URL lines
-        $lines = array_filter(explode("\n", $contents), function ($line) {
-            return ! str_contains($line, 'DB_URL=');
-        });
+        $lines = array_filter(explode("\n", $contents), fn($line) => ! str_contains($line, 'DB_URL='));
 
         File::put(base_path('.env'), implode("\n", $lines));
 
