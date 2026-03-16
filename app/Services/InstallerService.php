@@ -63,6 +63,18 @@ class InstallerService
 
     // ── Database ─────────────────────────────────────────────────────────
 
+    /** Returns true if .env already has valid MySQL DB credentials written. */
+    public function isDatabaseConfigured(): bool
+    {
+        $envPath = base_path('.env');
+        if (! file_exists($envPath)) {
+            return false;
+        }
+        $env = file_get_contents($envPath);
+        return (bool) preg_match('/^DB_CONNECTION=mysql\s*$/im', $env)
+            && (bool) preg_match('/^DB_DATABASE=\S+/im', $env);
+    }
+
     public function testDatabaseConnection(array $data): bool
     {
         try {
@@ -111,9 +123,11 @@ class InstallerService
 
         File::put(base_path('.env'), implode("\n", $lines));
 
-        // Reload config so new DB values are picked up
+        // Reload config so new DB values are picked up.
+        // NOTE: Do NOT call key:generate here — APP_KEY is already set by
+        // public/index.php on first boot. Regenerating it would invalidate
+        // the current session and break the installer flow.
         Artisan::call('config:clear');
-        Artisan::call('key:generate', ['--force' => true]);
 
         return true;
     }

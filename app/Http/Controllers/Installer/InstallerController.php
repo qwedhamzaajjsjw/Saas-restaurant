@@ -75,7 +75,12 @@ class InstallerController extends Controller
 
     public function migrate()
     {
-        if (! session()->has('installer_db')) {
+        // Accept session OR a written .env with valid DB credentials as proof
+        // that the database step was completed (key:generate in writeEnvFile used
+        // to invalidate the session; this fallback keeps the flow working).
+        $dbConfigured = session()->has('installer_db') || $this->installer->isDatabaseConfigured();
+
+        if (! $dbConfigured) {
             return redirect()->route('installer.database')
                 ->with('error', 'Please configure the database first.');
         }
