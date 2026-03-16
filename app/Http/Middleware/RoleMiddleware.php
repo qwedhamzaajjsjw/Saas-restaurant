@@ -16,8 +16,19 @@ class RoleMiddleware
 {
     public function handle(Request $request, Closure $next, string $role): Response
     {
-        if (! $request->user() || $request->user()->role !== $role) {
-            abort(403, 'Unauthorized. You do not have the required role.');
+        $user = $request->user();
+
+        if (! $user) {
+            return redirect()->route('login');
+        }
+
+        if ($user->role !== $role) {
+            // Redirect to the correct dashboard instead of showing a 403
+            return match ($user->role) {
+                'super_admin'      => redirect()->route('admin.dashboard'),
+                'restaurant_owner' => redirect()->route('restaurant.dashboard'),
+                default            => abort(403, 'Unauthorized. You do not have the required role.'),
+            };
         }
 
         return $next($request);
