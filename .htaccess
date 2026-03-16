@@ -1,0 +1,28 @@
+# ============================================================
+#  ROOT .htaccess – Shared Hosting (Hostinger / cPanel)
+#  ------------------------------------------------------------
+#  Transparently routes all web traffic to the /public folder
+#  so the full project can be uploaded directly to public_html/
+#  without exposing app/, config/, vendor/, .env, etc.
+# ============================================================
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # If the requested file/folder exists inside public/, serve it directly
+    # (covers assets like /public/favicon.ico, /public/build/*, etc.)
+    RewriteCond %{REQUEST_URI} !^/public/
+    RewriteCond %{DOCUMENT_ROOT}/public%{REQUEST_URI} -f [OR]
+    RewriteCond %{DOCUMENT_ROOT}/public%{REQUEST_URI} -d
+    RewriteRule ^(.*)$ public/$1 [L]
+
+    # For everything else, route through public/index.php (Laravel front controller)
+    RewriteCond %{REQUEST_URI} !^/public/
+    RewriteRule ^(.*)$ public/index.php [L]
+</IfModule>
+
+# ── Block direct access to sensitive files ────────────────────────────────────
+<FilesMatch "^\.env|composer\.(json|lock)$|artisan$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
