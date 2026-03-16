@@ -2,6 +2,20 @@
 @section('title', $restaurant->name)
 
 @section('content')
+@php
+    $rid              = $restaurant->id;
+    $showOffers       = \App\Models\Setting::get('show_offers_section',   true, $rid);
+    $showFeatured     = \App\Models\Setting::get('show_featured_section', true, $rid);
+    $showCategoryNav  = \App\Models\Setting::get('show_category_nav',     true, $rid);
+    $showRestInfo     = \App\Models\Setting::get('show_restaurant_info',  true, $rid);
+    $currencySymbol   = \App\Models\Setting::get('currency_symbol',       '$',  $rid);
+    $deliveryEnabled  = \App\Models\Setting::get('delivery_enabled',      true, $rid);
+    $takeawayEnabled  = \App\Models\Setting::get('takeaway_enabled',      true, $rid);
+    $dineInEnabled    = \App\Models\Setting::get('dine_in_enabled',       true, $rid);
+    $deliveryFee      = \App\Models\Setting::get('delivery_fee',          0,    $rid);
+    $minOrder         = \App\Models\Setting::get('min_order_amount',      0,    $rid);
+    $deliveryTime     = \App\Models\Setting::get('delivery_time',         '30-45', $rid);
+@endphp
 
 {{-- ══════════════════════════════════════════════════════════════════════
      HERO SLIDER  (full-width, breaks out of the max-w container)
@@ -14,9 +28,10 @@
         if ($restaurant->cover_image)
             $slides[] = ['img' => asset('storage/'.$restaurant->cover_image), 'title' => $restaurant->name, 'sub' => $restaurant->description ?? 'Fresh & Delicious Food'];
         // Fill up to 3 slides with featured product images
-        foreach ($featured->take(3 - count($slides)) as $p)
-            if ($p->image)
-                $slides[] = ['img' => $p->image_url, 'title' => $p->name, 'sub' => $p->description ?? ''];
+        if ($showFeatured)
+            foreach ($featured->take(3 - count($slides)) as $p)
+                if ($p->image)
+                    $slides[] = ['img' => $p->image_url, 'title' => $p->name, 'sub' => $p->description ?? ''];
         // Fallback gradient slides
         $gradients = [
             'from-orange-500 to-red-500',
@@ -94,6 +109,7 @@
 {{-- ══════════════════════════════════════════════════════════════════════
      RESTAURANT INFO BAR
 ══════════════════════════════════════════════════════════════════════ --}}
+@if($showRestInfo)
 <div class="-mx-4 bg-white border-b border-gray-100 px-4 py-3 mb-6 shadow-sm">
     <div class="max-w-5xl mx-auto flex flex-wrap items-center gap-4 text-sm text-gray-600">
         @if($restaurant->address)
@@ -116,16 +132,32 @@
             <span class="w-2 h-2 rounded-full {{ $restaurant->accepts_orders ? 'bg-green-500' : 'bg-red-500' }}"></span>
             {{ $restaurant->accepts_orders ? 'Accepting Orders' : 'Closed' }}
         </span>
+        @if($deliveryFee > 0)
+        <span class="flex items-center gap-1 text-xs text-gray-400">
+            🚚 Delivery: {{ $currencySymbol }}{{ number_format($deliveryFee,2) }}
+        </span>
+        @endif
+        @if($minOrder > 0)
+        <span class="flex items-center gap-1 text-xs text-gray-400">
+            Min: {{ $currencySymbol }}{{ number_format($minOrder,2) }}
+        </span>
+        @endif
+        @if($deliveryTime)
+        <span class="flex items-center gap-1 text-xs text-gray-400">
+            ⏱ {{ $deliveryTime }} min
+        </span>
+        @endif
     </div>
 </div>
+@endif
 
 {{-- ══════════════════════════════════════════════════════════════════════
      CATEGORY QUICK NAV
 ══════════════════════════════════════════════════════════════════════ --}}
-@if($categories->isNotEmpty())
+@if($showCategoryNav && $categories->isNotEmpty())
 <div class="-mx-4 bg-white border-b border-gray-100 px-4 py-3 mb-8 overflow-x-auto sticky top-16 z-20 shadow-sm">
     <div class="flex gap-2 whitespace-nowrap min-w-max">
-        @if($offers->isNotEmpty())
+        @if($showOffers && $offers->isNotEmpty())
         <a href="#offers-section"
            class="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-sm font-semibold bg-red-500 text-white hover:bg-red-600 transition">
             🔥 Offers
@@ -148,7 +180,7 @@
 {{-- ══════════════════════════════════════════════════════════════════════
      SPECIAL OFFERS SECTION
 ══════════════════════════════════════════════════════════════════════ --}}
-@if($offers->isNotEmpty())
+@if($showOffers && $offers->isNotEmpty())
 <section id="offers-section" class="mb-10" id="menu-section">
     <div class="flex items-center gap-3 mb-5">
         <div class="flex items-center gap-2">
@@ -201,9 +233,9 @@
                 @endif
                 <div class="flex items-center justify-between">
                     <div>
-                        <span class="text-lg font-black text-brand">{{ number_format($product->effective_price, 2) }}</span>
+                        <span class="text-lg font-black text-brand">{{ $currencySymbol }}{{ number_format($product->effective_price, 2) }}</span>
                         @if($product->sale_price && $product->sale_price < $product->price)
-                        <span class="text-xs text-gray-400 line-through ml-1">{{ number_format($product->price, 2) }}</span>
+                        <span class="text-xs text-gray-400 line-through ml-1">{{ $currencySymbol }}{{ number_format($product->price, 2) }}</span>
                         @endif
                     </div>
                     @if($restaurant->accepts_orders)
@@ -285,11 +317,11 @@
                 <div class="flex items-center justify-between mt-2">
                     <div class="flex flex-col">
                         <span class="font-black text-brand text-sm">
-                            {{ number_format($product->effective_price, 2) }}
+                            {{ $currencySymbol }}{{ number_format($product->effective_price, 2) }}
                         </span>
                         @if($product->sale_price && $product->sale_price < $product->price)
                         <span class="text-xs text-gray-300 line-through leading-none">
-                            {{ number_format($product->price, 2) }}
+                            {{ $currencySymbol }}{{ number_format($product->price, 2) }}
                         </span>
                         @endif
                     </div>
@@ -438,9 +470,10 @@
 @push('scripts')
 <script>
 // ── Cart config ────────────────────────────────────────────────────────────
-const CART_URL    = "{{ route('customer.cart.add', $restaurant->slug) }}";
-const CSRF_TOKEN  = document.querySelector('meta[name="csrf-token"]').content;
-const ACCEPTS     = {{ $restaurant->accepts_orders ? 'true' : 'false' }};
+const CART_URL       = "{{ route('customer.cart.add', $restaurant->slug) }}";
+const CSRF_TOKEN     = document.querySelector('meta[name="csrf-token"]').content;
+const ACCEPTS        = {{ $restaurant->accepts_orders ? 'true' : 'false' }};
+const CURRENCY_SYM   = "{{ $currencySymbol }}";
 
 // ── Hero Slider ────────────────────────────────────────────────────────────
 (function() {
@@ -615,7 +648,7 @@ function updateTotal() {
     if (!modalProduct) return;
     const extrasTotal = selectedExtras.reduce((s, e) => s + e.price, 0);
     const total = (modalProduct.price + extrasTotal) * modalQty;
-    document.getElementById('modal-total').textContent = total.toFixed(2);
+    document.getElementById('modal-total').textContent = CURRENCY_SYM + total.toFixed(2);
 }
 
 async function addToCart() {
@@ -649,7 +682,7 @@ async function addToCart() {
         btn.disabled = false;
         const extrasTotal = selectedExtras.reduce((s,e) => s + e.price, 0);
         const total = (modalProduct.price + extrasTotal) * modalQty;
-        btn.innerHTML = `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/></svg> Add to Cart — <span id="modal-total">${total.toFixed(2)}</span>`;
+        btn.innerHTML = `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/></svg> Add to Cart — <span id="modal-total">${CURRENCY_SYM}${total.toFixed(2)}</span>`;
     }
 }
 
