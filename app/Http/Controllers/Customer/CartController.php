@@ -35,6 +35,7 @@ class CartController extends Controller
             'product_id' => 'required|integer|exists:products,id',
             'quantity'   => 'sometimes|integer|min:1|max:99',
             'notes'      => 'sometimes|nullable|string|max:255',
+            'extras'     => 'sometimes|nullable|json',
         ]);
 
         $restaurant = Restaurant::where('slug', $slug)
@@ -48,8 +49,10 @@ class CartController extends Controller
             ->where('is_available', true)
             ->firstOrFail();
 
+        $extras = $request->extras ? json_decode($request->extras, true) : [];
+
         $cart = new CartService($slug);
-        $cart->add($product, $request->integer('quantity', 1), $request->notes);
+        $cart->add($product, $request->integer('quantity', 1), $request->notes, $extras ?? []);
 
         if ($request->expectsJson()) {
             return response()->json([
@@ -66,7 +69,7 @@ class CartController extends Controller
      * تحديث كمية منتج في السلة
      * PATCH /restaurant/{slug}/cart/{item}  — item = product_id
      */
-    public function update(Request $request, string $slug, int $item)
+    public function update(Request $request, string $slug, string $item)
     {
         $request->validate([
             'quantity' => 'required|integer|min:0|max:99',
@@ -90,7 +93,7 @@ class CartController extends Controller
      * حذف منتج من السلة
      * DELETE /restaurant/{slug}/cart/{item}  — item = product_id
      */
-    public function remove(Request $request, string $slug, int $item)
+    public function remove(Request $request, string $slug, string $item)
     {
         $cart = new CartService($slug);
         $cart->remove($item);

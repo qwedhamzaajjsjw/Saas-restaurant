@@ -27,13 +27,13 @@
 
         {{-- ── Cart items ──────────────────────────────────────────────── --}}
         <div class="md:col-span-2 space-y-3">
-            @foreach($cart->all() as $productId => $item)
+            @foreach($cart->all() as $cartKey => $item)
             <div class="bg-white rounded-2xl border border-gray-100 p-4 flex items-center gap-4">
 
                 <div class="w-16 h-16 rounded-xl bg-gray-100 flex-shrink-0 overflow-hidden">
                     @if($item['image'])
-                        <img src="{{ asset('storage/'.$item['image']) }}"
-                             alt="{{ $item['name'] }}" class="w-full h-full object-cover">
+                        @php $imgSrc = str_starts_with($item['image'], 'http') ? $item['image'] : asset('storage/'.$item['image']); @endphp
+                        <img src="{{ $imgSrc }}" alt="{{ $item['name'] }}" class="w-full h-full object-cover">
                     @else
                         <div class="w-full h-full flex items-center justify-center">
                             <svg class="w-6 h-6 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -46,15 +46,25 @@
 
                 <div class="flex-1 min-w-0">
                     <p class="font-semibold text-gray-800 text-sm truncate">{{ $item['name'] }}</p>
-                    <p class="text-brand text-sm font-bold">{{ number_format($item['price'], 2) }}</p>
+                    {{-- Extras list --}}
+                    @if(!empty($item['extras']))
+                    <div class="flex flex-wrap gap-1 mt-0.5">
+                        @foreach($item['extras'] as $extra)
+                        <span class="text-xs bg-orange-50 text-orange-600 px-1.5 py-0.5 rounded-md font-medium">
+                            + {{ $extra['name'] }}{{ $extra['price'] > 0 ? ' ('.number_format($extra['price'],2).')' : '' }}
+                        </span>
+                        @endforeach
+                    </div>
+                    @endif
+                    <p class="text-brand text-sm font-bold mt-0.5">{{ number_format($item['price'], 2) }}</p>
                     @if($item['notes'])
-                        <p class="text-xs text-gray-400 mt-0.5 truncate">{{ $item['notes'] }}</p>
+                        <p class="text-xs text-gray-400 mt-0.5 truncate italic">{{ $item['notes'] }}</p>
                     @endif
                 </div>
 
                 {{-- Quantity controls --}}
                 <div class="flex items-center gap-2">
-                    <form action="{{ route('customer.cart.update', [$restaurant->slug, $productId]) }}"
+                    <form action="{{ route('customer.cart.update', [$restaurant->slug, $cartKey]) }}"
                           method="POST" class="flex items-center gap-1">
                         @csrf @method('PATCH')
                         <button type="submit" name="quantity" value="{{ max(0, $item['quantity']-1) }}"
@@ -68,7 +78,7 @@
                         </button>
                     </form>
 
-                    <form action="{{ route('customer.cart.remove', [$restaurant->slug, $productId]) }}"
+                    <form action="{{ route('customer.cart.remove', [$restaurant->slug, $cartKey]) }}"
                           method="POST">
                         @csrf @method('DELETE')
                         <button type="submit"

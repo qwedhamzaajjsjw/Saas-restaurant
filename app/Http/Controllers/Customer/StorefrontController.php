@@ -37,9 +37,19 @@ class StorefrontController extends Controller
             ->limit(8)
             ->get();
 
+        // Products with active sale price (offers section)
+        $offers = $restaurant->products()
+            ->withoutGlobalScopes()
+            ->where('is_available', true)
+            ->whereNotNull('sale_price')
+            ->whereColumn('sale_price', '<', 'price')
+            ->orderBy('sort_order')
+            ->limit(6)
+            ->get();
+
         $cart = new CartService($slug);
 
-        return view('customer.index', compact('restaurant', 'categories', 'featured', 'cart'));
+        return view('customer.index', compact('restaurant', 'categories', 'featured', 'offers', 'cart'));
     }
 
     /**

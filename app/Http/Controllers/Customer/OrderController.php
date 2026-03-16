@@ -89,6 +89,7 @@ class OrderController extends Controller
                     'unit_price'   => $item['price'],
                     'quantity'     => $item['quantity'],
                     'subtotal'     => $item['price'] * $item['quantity'],
+                    'options'      => !empty($item['extras']) ? $item['extras'] : null,
                     'notes'        => $item['notes'] ?? null,
                 ]);
             }

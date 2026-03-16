@@ -37,22 +37,29 @@ class CartService
 
     // ── إضافة منتج ───────────────────────────────────────────────────
 
-    public function add(Product $product, int $quantity = 1, ?string $notes = null): void
+    public function add(Product $product, int $quantity = 1, ?string $notes = null, array $extras = []): void
     {
         $cart = $this->all();
-        $key  = $product->id;
+
+        // Unique key: productId alone if no extras, productId_hash if with extras
+        $key = empty($extras) ? (string) $product->id : $product->id.'_'.substr(md5(json_encode($extras)), 0, 8);
+
+        // Extras price sum
+        $extrasPrice = collect($extras)->sum('price');
+        $unitPrice   = (float) ($product->sale_price ?? $product->price) + (float) $extrasPrice;
 
         if (isset($cart[$key])) {
-            // إذا كان موجوداً نزيد الكمية فقط
             $cart[$key]['quantity'] += $quantity;
         } else {
             $cart[$key] = [
-                'product_id'   => $product->id,
-                'name'         => $product->name,
-                'price'        => (float) ($product->sale_price ?? $product->price),
-                'image'        => $product->image,
-                'quantity'     => $quantity,
-                'notes'        => $notes,
+                'product_id' => $product->id,
+                'cart_key'   => $key,
+                'name'       => $product->name,
+                'price'      => $unitPrice,
+                'image'      => $product->image,
+                'quantity'   => $quantity,
+                'notes'      => $notes,
+                'extras'     => $extras,
             ];
         }
 
@@ -61,27 +68,27 @@ class CartService
 
     // ── تحديث الكمية ─────────────────────────────────────────────────
 
-    public function update(int $productId, int $quantity): void
+    public function update(string $cartKey, int $quantity): void
     {
         $cart = $this->all();
 
         if ($quantity <= 0) {
-            $this->remove($productId);
+            $this->remove($cartKey);
             return;
         }
 
-        if (isset($cart[$productId])) {
-            $cart[$productId]['quantity'] = $quantity;
+        if (isset($cart[$cartKey])) {
+            $cart[$cartKey]['quantity'] = $quantity;
             session([$this->sessionKey => $cart]);
         }
     }
 
     // ── حذف منتج ─────────────────────────────────────────────────────
 
-    public function remove(int $productId): void
+    public function remove(string $cartKey): void
     {
         $cart = $this->all();
-        unset($cart[$productId]);
+        unset($cart[$cartKey]);
         session([$this->sessionKey => $cart]);
     }
 
