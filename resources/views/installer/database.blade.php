@@ -9,15 +9,41 @@
 <form method="POST" action="{{ route('installer.database.save') }}" class="space-y-5">
     @csrf
 
-    {{-- App URL --}}
+    {{-- App Name --}}
     <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1.5">Application URL</label>
-        <input type="url" name="app_url"
-               value="{{ old('app_url', $defaults['app_url']) }}"
-               placeholder="http://localhost"
+        <label class="block text-sm font-medium text-gray-700 mb-1.5">Application Name</label>
+        <input type="text" name="app_name"
+               value="{{ old('app_name', $defaults['app_name']) }}"
+               placeholder="Restaurant SaaS"
                class="w-full border rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400
-                      {{ $errors->has('app_url') ? 'border-red-400 bg-red-50' : 'border-gray-300' }}">
-        @error('app_url') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+                      {{ $errors->has('app_name') ? 'border-red-400 bg-red-50' : 'border-gray-300' }}">
+        @error('app_name') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+    </div>
+
+    {{-- App URL + Timezone --}}
+    <div class="grid grid-cols-2 gap-4">
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1.5">Application URL</label>
+            <input type="url" name="app_url"
+                   value="{{ old('app_url', $defaults['app_url']) }}"
+                   placeholder="https://example.com"
+                   class="w-full border rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400
+                          {{ $errors->has('app_url') ? 'border-red-400 bg-red-50' : 'border-gray-300' }}">
+            @error('app_url') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+        </div>
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1.5">Timezone</label>
+            <select name="timezone"
+                    class="w-full border rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400
+                           {{ $errors->has('timezone') ? 'border-red-400 bg-red-50' : 'border-gray-300' }}">
+                @foreach($timezones as $tz)
+                    <option value="{{ $tz }}" {{ old('timezone', $defaults['timezone']) === $tz ? 'selected' : '' }}>
+                        {{ $tz }}
+                    </option>
+                @endforeach
+            </select>
+            @error('timezone') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+        </div>
     </div>
 
     <hr class="border-gray-100">

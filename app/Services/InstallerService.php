@@ -78,11 +78,13 @@ class InstallerService
     {
         $template = File::get(base_path('.env.example'));
 
+        $appName = $data['app_name'] ?? 'Restaurant SaaS';
         $map = [
-            'APP_NAME=Laravel'            => 'APP_NAME="Restaurant SaaS"',
+            'APP_NAME=Laravel'            => 'APP_NAME="'.str_replace('"', '\\"', $appName).'"',
             'APP_ENV=local'               => 'APP_ENV=production',
             'APP_DEBUG=true'              => 'APP_DEBUG=false',
             'APP_URL=http://localhost'     => 'APP_URL='.rtrim($data['app_url'] ?? 'http://localhost', '/'),
+            'APP_TIMEZONE=UTC'            => 'APP_TIMEZONE='.($data['timezone'] ?? 'UTC'),
             'DB_CONNECTION=sqlite'        => 'DB_CONNECTION=mysql',
             'DB_HOST=127.0.0.1'           => 'DB_HOST='.($data['db_host'] ?? '127.0.0.1'),
             'DB_PORT=3306'                => 'DB_PORT='.($data['db_port'] ?? '3306'),
