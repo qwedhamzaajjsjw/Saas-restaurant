@@ -23,7 +23,7 @@ class SubscriptionService
     {
         return $restaurant->subscriptions()
             ->with('plan')
-            ->where('status', 'active')
+            ->whereIn('status', ['active', 'trial'])
             ->where(function ($q) {
                 $q->whereNull('ends_at')
                   ->orWhere('ends_at', '>', now());

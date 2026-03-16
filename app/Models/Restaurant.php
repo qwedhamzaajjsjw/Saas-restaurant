@@ -147,4 +147,9 @@ class Restaurant extends Model
     {
         return $this->hasMany(Setting::class);
     }
+
+    public function banners(): HasMany
+    {
+        return $this->hasMany(Banner::class);
+    }
 }
