@@ -1,13 +1,25 @@
 @extends('layouts.auth')
-@section('title', 'Sign In')
-@section('subtitle', 'Sign in to your account')
+@section('title', 'Restaurant Login')
+@section('subtitle', 'Sign in to your restaurant dashboard')
 
 @section('content')
 
-<h2 class="text-xl font-bold text-gray-800 mb-6">Welcome back</h2>
+<div class="flex items-center justify-center mb-4">
+    <span class="inline-flex items-center gap-2 bg-orange-50 text-orange-600 text-xs font-semibold px-3 py-1.5 rounded-full border border-orange-200">
+        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-2 10v-5a1 1 0 00-1-1h-2a1 1 0 00-1 1v5m4 0H9"/>
+        </svg>
+        Restaurant Owner Portal
+    </span>
+</div>
+
+<h2 class="text-xl font-bold text-gray-800 mb-1 text-center">Welcome back</h2>
+<p class="text-sm text-gray-400 text-center mb-6">Access your restaurant management dashboard</p>
 
 <form method="POST" action="{{ route('login.post') }}" class="space-y-5">
     @csrf
+    <input type="hidden" name="portal" value="restaurant">
 
     {{-- Email --}}
     <div>
@@ -59,7 +71,6 @@
                    placeholder="••••••••"
                    class="w-full pl-10 pr-12 py-2.5 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-orange-400
                           {{ $errors->has('password') ? 'border-red-400 bg-red-50' : 'border-gray-300' }}">
-            {{-- Toggle visibility --}}
             <button type="button" onclick="togglePassword()"
                     class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-gray-400 hover:text-gray-600">
                 <svg id="eye-icon" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -86,24 +97,22 @@
     <button type="submit"
             class="w-full flex items-center justify-center gap-2 bg-orange-500 hover:bg-orange-600
                    text-white font-semibold py-2.5 rounded-xl transition-colors duration-200 text-sm">
-        Sign In
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/>
         </svg>
+        Sign In to Dashboard
     </button>
 </form>
 
-{{-- Role hint --}}
+{{-- Footer note --}}
 <div class="mt-6 pt-5 border-t border-gray-100 text-center">
-    <p class="text-xs text-gray-400 mb-2">Are you a restaurant owner?</p>
-    <a href="{{ route('restaurant.login') }}"
-       class="inline-flex items-center gap-1.5 text-xs text-orange-500 hover:text-orange-600 font-medium">
-        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-2 10v-5a1 1 0 00-1-1h-2a1 1 0 00-1 1v5m4 0H9"/>
-        </svg>
-        Restaurant Owner Login
-    </a>
+    <p class="text-xs text-gray-400">
+        Are you a platform admin?
+        <a href="{{ route('login') }}" class="text-orange-500 hover:text-orange-600 font-medium">
+            Admin Login
+        </a>
+    </p>
 </div>
 
 @endsection

@@ -12,11 +12,41 @@
     <div class="bg-white rounded-2xl border border-gray-100 p-8">
         <h2 class="text-lg font-semibold text-gray-800 mb-6">New Restaurant</h2>
 
-        <form method="POST" action="{{ route('admin.restaurants.store') }}" class="space-y-6">
+        <form method="POST" action="{{ route('admin.restaurants.store') }}" class="space-y-6"
+              enctype="multipart/form-data">
             @csrf
 
             {{-- ── Basic Info ──────────────────────────────────────────── --}}
             <div class="grid grid-cols-2 gap-4">
+                {{-- Logo Upload --}}
+                <div class="col-span-2">
+                    <label class="block text-sm font-medium text-gray-700 mb-1.5">Restaurant Logo</label>
+                    <div class="flex items-center gap-4">
+                        <div id="logo-preview-container"
+                             class="w-20 h-20 rounded-2xl border-2 border-dashed border-gray-300 flex items-center justify-center bg-gray-50 overflow-hidden flex-shrink-0">
+                            <svg id="logo-placeholder" class="w-8 h-8 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                      d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                            </svg>
+                            <img id="logo-preview" src="" alt="" class="hidden w-full h-full object-cover">
+                        </div>
+                        <div class="flex-1">
+                            <label for="logo"
+                                   class="cursor-pointer inline-flex items-center gap-2 border border-gray-300 text-gray-600 hover:bg-gray-50 text-sm font-medium px-4 py-2 rounded-xl transition">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                          d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
+                                </svg>
+                                Upload Logo
+                            </label>
+                            <input type="file" id="logo" name="logo" accept="image/*" class="hidden"
+                                   onchange="previewLogo(this)">
+                            <p class="text-xs text-gray-400 mt-1.5">PNG, JPG, GIF up to 2MB</p>
+                            @error('logo')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
+                        </div>
+                    </div>
+                </div>
+
                 <div class="col-span-2">
                     <label class="block text-sm font-medium text-gray-700 mb-1.5">Restaurant Name *</label>
                     <input type="text" name="name" value="{{ old('name') }}"
@@ -160,6 +190,20 @@
 </div>
 
 <script>
+function previewLogo(input) {
+    const preview = document.getElementById('logo-preview');
+    const placeholder = document.getElementById('logo-placeholder');
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            preview.src = e.target.result;
+            preview.classList.remove('hidden');
+            placeholder.classList.add('hidden');
+        };
+        reader.readAsDataURL(input.files[0]);
+    }
+}
+
 (function () {
     const tabs   = document.querySelectorAll('.domain-tab');
     const panels = document.querySelectorAll('.domain-panel');

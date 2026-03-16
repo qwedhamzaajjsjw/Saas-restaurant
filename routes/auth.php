@@ -15,9 +15,12 @@ use Illuminate\Support\Facades\Route;
 // ── Guest-only routes ────────────────────────────────────────────────────
 Route::middleware('guest')->group(function () {
 
-    // Login
+    // Login (Super Admin / General)
     Route::get('/login',  [LoginController::class, 'showForm'])->name('login');
     Route::post('/login', [LoginController::class, 'login'])->name('login.post');
+
+    // Restaurant Owner Login
+    Route::get('/restaurant/login', [LoginController::class, 'showRestaurantForm'])->name('restaurant.login');
 
     // Forgot password
     Route::get('/forgot-password',  [ForgotPasswordController::class, 'showForm'])

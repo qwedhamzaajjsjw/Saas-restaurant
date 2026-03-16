@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 
 class RestaurantController extends Controller
@@ -55,6 +56,7 @@ class RestaurantController extends Controller
             'address'        => ['nullable', 'string', 'max:255'],
             'city'           => ['nullable', 'string', 'max:100'],
             'plan_id'        => ['required', 'exists:plans,id'],
+            'logo'           => ['nullable', 'image', 'max:2048'],
             'domain_type'    => ['required', 'in:subdomain,custom,none'],
             'subdomain'      => [
                 'nullable', 'string', 'max:63',
@@ -74,7 +76,13 @@ class RestaurantController extends Controller
             'owner_password' => ['required', 'string', 'min:8'],
         ]);
 
-        DB::transaction(function () use ($data) {
+        // Handle logo upload before transaction
+        $logoPath = null;
+        if ($request->hasFile('logo')) {
+            $logoPath = $request->file('logo')->store('logos', 'public');
+        }
+
+        DB::transaction(function () use ($data, $logoPath) {
             $restaurant = Restaurant::create([
                 'name'          => $data['name'],
                 'slug'          => Str::slug($data['name']).'-'.Str::random(4),
@@ -83,6 +91,7 @@ class RestaurantController extends Controller
                 'address'       => $data['address'] ?? null,
                 'city'          => $data['city']    ?? null,
                 'plan_id'       => $data['plan_id'],
+                'logo'          => $logoPath,
                 'status'        => 'active',
                 'subdomain'     => $data['domain_type'] === 'subdomain' ? ($data['subdomain'] ?? null) : null,
                 'custom_domain' => $data['domain_type'] === 'custom'    ? ($data['custom_domain'] ?? null) : null,

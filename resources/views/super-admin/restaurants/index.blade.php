@@ -63,9 +63,14 @@
             <tr class="hover:bg-gray-50 transition">
                 <td class="px-6 py-4">
                     <div class="flex items-center gap-3">
-                        <div class="w-9 h-9 bg-orange-100 rounded-xl flex items-center justify-center font-bold text-orange-600">
-                            {{ strtoupper(substr($restaurant->name, 0, 1)) }}
-                        </div>
+                        @if($restaurant->logo)
+                            <img src="{{ $restaurant->logo_url }}" alt="{{ $restaurant->name }}"
+                                 class="w-9 h-9 rounded-xl object-cover border border-gray-100">
+                        @else
+                            <div class="w-9 h-9 bg-orange-100 rounded-xl flex items-center justify-center font-bold text-orange-600">
+                                {{ strtoupper(substr($restaurant->name, 0, 1)) }}
+                            </div>
+                        @endif
                         <div>
                             <p class="font-medium text-gray-800">{{ $restaurant->name }}</p>
                             <p class="text-xs text-gray-400">{{ $restaurant->email ?? $restaurant->city }}</p>
@@ -83,14 +88,35 @@
                 </td>
                 <td class="px-6 py-4 text-gray-400 text-xs">{{ $restaurant->created_at->format('M d, Y') }}</td>
                 <td class="px-6 py-4">
-                    <div class="flex items-center gap-2 justify-end">
+                    <div class="flex items-center gap-1.5 justify-end flex-wrap">
+                        {{-- Dashboard --}}
+                        <a href="{{ route('restaurant.login') }}"
+                           title="Restaurant Dashboard Login"
+                           class="inline-flex items-center gap-1 text-xs bg-orange-50 text-orange-600 hover:bg-orange-100 border border-orange-200 px-2.5 py-1.5 rounded-lg font-medium transition">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                      d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+                            </svg>
+                            Dashboard
+                        </a>
+                        {{-- Storefront Preview --}}
+                        <a href="{{ $restaurant->storefront_url }}" target="_blank"
+                           title="View Restaurant Storefront"
+                           class="inline-flex items-center gap-1 text-xs bg-blue-50 text-blue-600 hover:bg-blue-100 border border-blue-200 px-2.5 py-1.5 rounded-lg font-medium transition">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                      d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+                            </svg>
+                            Preview
+                        </a>
+                        {{-- View Details --}}
                         <a href="{{ route('admin.restaurants.show', $restaurant) }}"
-                           class="text-xs text-blue-500 hover:underline">View</a>
+                           class="text-xs text-gray-500 hover:text-gray-700 px-2 py-1.5 hover:underline">View</a>
                         <a href="{{ route('admin.restaurants.edit', $restaurant) }}"
-                           class="text-xs text-gray-500 hover:underline">Edit</a>
+                           class="text-xs text-gray-500 hover:text-gray-700 px-2 py-1.5 hover:underline">Edit</a>
                         <form method="POST" action="{{ route('admin.restaurants.toggle-status', $restaurant) }}">
                             @csrf @method('PATCH')
-                            <button class="text-xs {{ $restaurant->status === 'active' ? 'text-red-500' : 'text-green-500' }} hover:underline">
+                            <button class="text-xs {{ $restaurant->status === 'active' ? 'text-red-500' : 'text-green-500' }} hover:underline px-2 py-1.5">
                                 {{ $restaurant->status === 'active' ? 'Suspend' : 'Activate' }}
                             </button>
                         </form>

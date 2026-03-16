@@ -12,12 +12,20 @@ class LoginController extends Controller
 {
     public function showForm(): View|RedirectResponse
     {
-        // Already logged in → send to correct dashboard
         if (Auth::check()) {
             return $this->redirectByRole(Auth::user());
         }
 
         return view('auth.login');
+    }
+
+    public function showRestaurantForm(): View|RedirectResponse
+    {
+        if (Auth::check()) {
+            return $this->redirectByRole(Auth::user());
+        }
+
+        return view('auth.restaurant-login');
     }
 
     public function login(Request $request): RedirectResponse
