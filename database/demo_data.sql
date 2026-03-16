@@ -1,11 +1,33 @@
 -- ============================================================
 -- Demo Restaurant Data — Burger House
 -- Compatible with: MySQL / MariaDB
--- Usage: Run this script on your production database
---        after running migrations (php artisan migrate)
+-- Usage: Run directly on your database — NO need for php artisan migrate
+--        mysql -u USERNAME -p DATABASE_NAME < database/demo_data.sql
 -- ============================================================
 
 SET FOREIGN_KEY_CHECKS = 0;
+
+-- ─────────────────────────────────────────────────────────────
+-- 0. CREATE BANNERS TABLE (if not exists)
+-- ─────────────────────────────────────────────────────────────
+
+CREATE TABLE IF NOT EXISTS `banners` (
+  `id`          BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `restaurant_id` BIGINT UNSIGNED NOT NULL,
+  `title`       VARCHAR(255) DEFAULT NULL,
+  `subtitle`    VARCHAR(255) DEFAULT NULL,
+  `image`       VARCHAR(255) DEFAULT NULL,
+  `link_url`    VARCHAR(255) DEFAULT NULL,
+  `button_text` VARCHAR(255) DEFAULT 'Order Now',
+  `is_active`   TINYINT(1) NOT NULL DEFAULT 1,
+  `sort_order`  TINYINT UNSIGNED NOT NULL DEFAULT 0,
+  `created_at`  TIMESTAMP NULL DEFAULT NULL,
+  `updated_at`  TIMESTAMP NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `banners_restaurant_id_foreign` (`restaurant_id`),
+  CONSTRAINT `banners_restaurant_id_foreign`
+    FOREIGN KEY (`restaurant_id`) REFERENCES `restaurants` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ─────────────────────────────────────────────────────────────
 -- 1. PLANS (create or ignore if already exist)
@@ -371,11 +393,19 @@ VALUES
   (@order_3, @product_4, 'برغر بيكون BBQ',      14.99, 1, 14.99, '[]', NULL,        NOW(), NOW()),
   (@order_3, @product_2, 'بطاطس محملة بالجبن',  5.99, 1, 5.99,  '[]', NULL,        NOW(), NOW());
 
+-- Register banners migration in Laravel migrations table (if not already there)
+INSERT IGNORE INTO `migrations` (`migration`, `batch`)
+SELECT '2024_01_03_000001_create_banners_table',
+       IFNULL((SELECT MAX(`batch`) FROM `migrations`), 1)
+WHERE NOT EXISTS (
+  SELECT 1 FROM `migrations`
+  WHERE `migration` = '2024_01_03_000001_create_banners_table'
+);
+
 SET FOREIGN_KEY_CHECKS = 1;
 
 -- ============================================================
 -- ✅ Done!
 -- Restaurant: Burger House
 -- Owner login: owner@burgerhouse.demo / Demo@123456
--- Restaurant ID: (last inserted)
 -- ============================================================
