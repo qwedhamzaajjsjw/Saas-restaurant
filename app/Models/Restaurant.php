@@ -74,9 +74,24 @@ class Restaurant extends Model
 
     public function getLogoUrlAttribute(): string
     {
-        return $this->logo
-            ? asset('storage/'.$this->logo)
-            : asset('images/default-restaurant.png');
+        if (!$this->logo) {
+            return asset('images/default-restaurant.png');
+        }
+        if (str_starts_with($this->logo, 'demo/')) {
+            return asset($this->logo);
+        }
+        return asset('storage/'.$this->logo);
+    }
+
+    public function getCoverImageUrlAttribute(): string
+    {
+        if (!$this->cover_image) {
+            return asset('images/default-cover.jpg');
+        }
+        if (str_starts_with($this->cover_image, 'demo/')) {
+            return asset($this->cover_image);
+        }
+        return asset('storage/'.$this->cover_image);
     }
 
     // ── Relationships ────────────────────────────────────────────────────

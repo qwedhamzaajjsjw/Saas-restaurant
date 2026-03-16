@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f59e0b"/>
+      <stop offset="100%" stop-color="#d97706"/>
+    </linearGradient>
+  </defs>
+  <rect width="400" height="300" fill="url(#bg)"/>
+  <circle cx="200" cy="150" r="120" fill="rgba(255,255,255,0.07)"/>
+  <!-- Container -->
+  <path d="M145 180 L160 260 L240 260 L255 180Z" fill="#dc2626"/>
+  <path d="M145 180 L255 180 L250 190 L150 190Z" fill="#ef4444"/>
+  <!-- Logo on box -->
+  <rect x="168" y="205" width="64" height="35" rx="4" fill="rgba(255,255,255,0.2)"/>
+  <!-- Fry sticks -->
+  <rect x="152" y="80" width="14" height="110" rx="6" fill="#fde68a"/>
+  <rect x="152" y="80" width="14" height="30" rx="4" fill="#fbbf24" opacity="0.7"/>
+  <rect x="170" y="65" width="14" height="125" rx="6" fill="#fde68a"/>
+  <rect x="170" y="65" width="14" height="35" rx="4" fill="#fbbf24" opacity="0.7"/>
+  <rect x="188" y="72" width="14" height="118" rx="6" fill="#fde68a"/>
+  <rect x="188" y="72" width="14" height="28" rx="4" fill="#fbbf24" opacity="0.7"/>
+  <rect x="206" y="60" width="14" height="130" rx="6" fill="#fde68a"/>
+  <rect x="206" y="60" width="14" height="40" rx="4" fill="#fbbf24" opacity="0.7"/>
+  <rect x="224" y="75" width="14" height="115" rx="6" fill="#fde68a"/>
+  <rect x="224" y="75" width="14" height="32" rx="4" fill="#fbbf24" opacity="0.7"/>
+</svg>

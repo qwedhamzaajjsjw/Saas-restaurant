@@ -7,7 +7,26 @@
     <title>@yield('title', 'Dashboard') — {{ auth()->user()->restaurant->name ?? 'Restaurant' }}</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gray-100 flex h-screen overflow-hidden font-sans">
+<body class="bg-gray-100 flex flex-col h-screen overflow-hidden font-sans">
+
+@if(session('returning_admin_id'))
+<div class="bg-indigo-700 text-white text-sm flex items-center justify-between px-6 py-2 flex-shrink-0 z-50">
+    <div class="flex items-center gap-2">
+        <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M15 12a3 3 0 11-6 0 3 3 0 016 0M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+        </svg>
+        <span>Super Admin Preview Mode — viewing as <strong>{{ auth()->user()->name }}</strong></span>
+    </div>
+    <a href="{{ route('auth.admin-return') }}"
+       class="bg-white text-indigo-700 font-semibold text-xs px-3 py-1 rounded-lg hover:bg-indigo-50 transition">
+        ← Return to Admin Panel
+    </a>
+</div>
+@endif
+
+{{-- ── Sidebar + Main wrapper ───────────────────────────────────────── --}}
+<div class="flex flex-1 overflow-hidden">
 
 {{-- ── Sidebar ──────────────────────────────────────────────────────── --}}
 <aside class="w-64 bg-white border-r border-gray-200 flex flex-col flex-shrink-0 shadow-sm">
@@ -158,6 +177,8 @@
         @yield('content')
     </main>
 </div>
+
+</div>{{-- end sidebar+main wrapper --}}
 
 @stack('scripts')
 </body>

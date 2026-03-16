@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#7c3aed"/>
+      <stop offset="100%" stop-color="#4c1d95"/>
+    </linearGradient>
+  </defs>
+  <rect width="400" height="300" fill="url(#bg)"/>
+  <circle cx="200" cy="150" r="120" fill="rgba(255,255,255,0.07)"/>
+  <!-- Glass -->
+  <path d="M158 100 L168 250 L232 250 L242 100Z" fill="rgba(255,255,255,0.15)"/>
+  <path d="M158 100 L242 100 L238 112 L162 112Z" fill="rgba(255,255,255,0.2)"/>
+  <!-- Shake fill (chocolate) -->
+  <path d="M162 112 L168 250 L232 250 L238 112Z" fill="#6b21a8" opacity="0.7"/>
+  <!-- Whipped cream -->
+  <ellipse cx="200" cy="95" rx="50" ry="20" fill="white" opacity="0.9"/>
+  <ellipse cx="183" cy="88" rx="18" ry="14" fill="white" opacity="0.95"/>
+  <ellipse cx="217" cy="88" rx="18" ry="14" fill="white" opacity="0.95"/>
+  <ellipse cx="200" cy="80" rx="15" ry="12" fill="white"/>
+  <!-- Cherry -->
+  <circle cx="200" cy="68" r="8" fill="#dc2626"/>
+  <path d="M200 60 Q210 50 215 45" stroke="#16a34a" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <!-- Straw -->
+  <rect x="218" y="35" width="8" height="75" rx="3" fill="#fbbf24" opacity="0.9"/>
+  <!-- Glass reflection -->
+  <rect x="163" y="118" width="8" height="120" rx="4" fill="rgba(255,255,255,0.15)"/>
+</svg>

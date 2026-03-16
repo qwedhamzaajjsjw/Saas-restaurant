@@ -9,6 +9,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
@@ -208,30 +209,24 @@ class RestaurantController extends Controller
     }
 
     /**
-     * Impersonate a restaurant owner — super admin can access the restaurant dashboard.
-     * Instead of switching users, we store the restaurant context in the session
-     * and keep the super admin logged in (avoids session regeneration issues).
+     * Switch to restaurant owner account so super admin can use the real dashboard.
+     * Creates a one-time cache token and redirects to a clean (role-free) switch route.
      */
     public function loginAs(Restaurant $restaurant)
     {
-        // Store impersonation context
-        session([
-            'impersonating_restaurant_id'   => $restaurant->id,
-            'impersonating_restaurant_name' => $restaurant->name,
-        ]);
+        $owner = $restaurant->users()->where('role', 'restaurant_owner')->first();
 
-        return redirect()->route('admin.restaurants.impersonate.dashboard', $restaurant)
-            ->with('success', 'Now previewing: '.$restaurant->name);
-    }
+        if (! $owner) {
+            return back()->with('error', 'This restaurant has no owner account yet.');
+        }
 
-    /**
-     * Stop impersonation and return to super admin session.
-     */
-    public function stopImpersonating()
-    {
-        session()->forget(['impersonating_restaurant_id', 'impersonating_restaurant_name']);
+        $token = Str::random(64);
 
-        return redirect()->route('admin.dashboard')
-            ->with('success', 'Returned to admin panel.');
+        Cache::put('restaurant_switch_' . $token, [
+            'admin_id'      => auth()->id(),
+            'restaurant_id' => $restaurant->id,
+        ], now()->addMinutes(2));
+
+        return redirect()->route('auth.restaurant-switch', $token);
     }
 }

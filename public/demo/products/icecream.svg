@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#8b5cf6"/>
+      <stop offset="100%" stop-color="#4c1d95"/>
+    </linearGradient>
+  </defs>
+  <rect width="400" height="300" fill="url(#bg)"/>
+  <circle cx="200" cy="150" r="120" fill="rgba(255,255,255,0.07)"/>
+  <!-- Cone -->
+  <path d="M160 190 L200 270 L240 190Z" fill="#d97706"/>
+  <path d="M160 190 L240 190 L235 200 L165 200Z" fill="#b45309"/>
+  <!-- Cone pattern -->
+  <line x1="180" y1="192" x2="200" y2="270" stroke="#b45309" stroke-width="1.5" opacity="0.5"/>
+  <line x1="220" y1="192" x2="200" y2="270" stroke="#b45309" stroke-width="1.5" opacity="0.5"/>
+  <path d="M161 205 Q200 210 239 205" stroke="#b45309" stroke-width="1.5" fill="none" opacity="0.5"/>
+  <path d="M165 220 Q200 226 235 220" stroke="#b45309" stroke-width="1.5" fill="none" opacity="0.5"/>
+  <path d="M170 238 Q200 244 230 238" stroke="#b45309" stroke-width="1.5" fill="none" opacity="0.5"/>
+  <!-- Scoop 3 (bottom) -->
+  <circle cx="200" cy="185" r="52" fill="#fce7f3"/>
+  <!-- Scoop 2 -->
+  <circle cx="200" cy="145" r="48" fill="#fda4af"/>
+  <!-- Scoop 1 (top) -->
+  <circle cx="200" cy="108" r="44" fill="#f9a8d4"/>
+  <!-- Chocolate drizzle -->
+  <path d="M185 105 Q195 125 182 140 Q195 135 205 150" stroke="#7c2d12" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <!-- Cherry on top -->
+  <circle cx="200" cy="65" r="10" fill="#dc2626"/>
+  <path d="M200 57 Q208 46 215 42" stroke="#16a34a" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <!-- Sprinkles -->
+  <rect x="175" y="120" width="10" height="4" rx="2" fill="#f97316" transform="rotate(40,175,120)"/>
+  <rect x="215" y="115" width="10" height="4" rx="2" fill="#0284c7" transform="rotate(-25,215,115)"/>
+  <rect x="190" y="155" width="10" height="4" rx="2" fill="#fbbf24" transform="rotate(60,190,155)"/>
+  <rect x="220" y="148" width="10" height="4" rx="2" fill="#16a34a" transform="rotate(-40,220,148)"/>
+</svg>

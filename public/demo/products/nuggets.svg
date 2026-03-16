@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#d97706"/>
+      <stop offset="100%" stop-color="#92400e"/>
+    </linearGradient>
+  </defs>
+  <rect width="400" height="300" fill="url(#bg)"/>
+  <circle cx="200" cy="150" r="120" fill="rgba(255,255,255,0.07)"/>
+  <!-- Box -->
+  <path d="M140 180 L145 240 L255 240 L260 180Z" fill="#dc2626"/>
+  <path d="M135 175 L265 175 L260 185 L140 185Z" fill="#b91c1c"/>
+  <!-- Box front design -->
+  <path d="M160 185 L165 240 L155 240 L150 185Z" fill="rgba(255,255,255,0.1)"/>
+  <rect x="155" y="200" width="90" height="8" rx="4" fill="rgba(255,255,255,0.15)"/>
+  <!-- Nuggets -->
+  <!-- Nugget 1 -->
+  <ellipse cx="185" cy="150" rx="35" ry="25" fill="#f59e0b" transform="rotate(-20,185,150)"/>
+  <ellipse cx="185" cy="150" rx="30" ry="20" fill="#fbbf24" transform="rotate(-20,185,150)"/>
+  <!-- Nugget 2 -->
+  <ellipse cx="230" cy="145" rx="32" ry="22" fill="#f59e0b" transform="rotate(15,230,145)"/>
+  <ellipse cx="230" cy="145" rx="27" ry="18" fill="#fbbf24" transform="rotate(15,230,145)"/>
+  <!-- Nugget 3 -->
+  <ellipse cx="160" cy="120" rx="28" ry="20" fill="#f59e0b" transform="rotate(10,160,120)"/>
+  <ellipse cx="160" cy="120" rx="24" ry="16" fill="#fbbf24" transform="rotate(10,160,120)"/>
+  <!-- Nugget 4 -->
+  <ellipse cx="215" cy="115" rx="30" ry="21" fill="#f59e0b" transform="rotate(-10,215,115)"/>
+  <ellipse cx="215" cy="115" rx="25" ry="17" fill="#fbbf24" transform="rotate(-10,215,115)"/>
+  <!-- Sauce dip -->
+  <ellipse cx="300" cy="210" rx="42" ry="22" fill="#dc2626" opacity="0.9"/>
+  <ellipse cx="300" cy="205" rx="38" ry="18" fill="#ef4444"/>
+  <ellipse cx="300" cy="205" rx="30" ry="14" fill="#dc2626"/>
+  <!-- Crispy texture dots on nuggets -->
+  <circle cx="182" cy="148" r="3" fill="#d97706" opacity="0.7"/>
+  <circle cx="192" cy="155" r="2" fill="#d97706" opacity="0.7"/>
+  <circle cx="175" cy="155" r="2.5" fill="#d97706" opacity="0.7"/>
+  <circle cx="228" cy="143" r="3" fill="#d97706" opacity="0.7"/>
+  <circle cx="236" cy="150" r="2" fill="#d97706" opacity="0.7"/>
+</svg>

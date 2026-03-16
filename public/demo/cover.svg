@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 450">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1a1a2e"/>
+      <stop offset="50%" stop-color="#16213e"/>
+      <stop offset="100%" stop-color="#0f3460"/>
+    </linearGradient>
+    <linearGradient id="glow" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#f97316" stop-opacity="0"/>
+      <stop offset="50%" stop-color="#f97316" stop-opacity="0.3"/>
+      <stop offset="100%" stop-color="#f97316" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="450" fill="url(#bg)"/>
+  <!-- Glow effect -->
+  <ellipse cx="600" cy="225" rx="500" ry="200" fill="url(#glow)"/>
+  <!-- Decorative circles -->
+  <circle cx="100" cy="80" r="120" fill="rgba(249,115,22,0.08)"/>
+  <circle cx="1100" cy="370" r="150" fill="rgba(249,115,22,0.06)"/>
+  <circle cx="950" cy="60" r="80" fill="rgba(249,115,22,0.05)"/>
+  <!-- Burger House text area -->
+  <rect x="200" y="130" width="500" height="180" rx="20" fill="rgba(255,255,255,0.03)"/>
+  <!-- Main icon - Burger silhouette -->
+  <ellipse cx="870" cy="150" rx="120" ry="55" fill="#d97706" opacity="0.9"/>
+  <ellipse cx="870" cy="130" rx="110" ry="38" fill="#f59e0b"/>
+  <!-- Sesame seeds -->
+  <ellipse cx="838" cy="122" rx="9" ry="6" fill="rgba(255,255,255,0.7)" transform="rotate(-20,838,122)"/>
+  <ellipse cx="875" cy="116" rx="9" ry="6" fill="rgba(255,255,255,0.7)" transform="rotate(10,875,116)"/>
+  <ellipse cx="908" cy="124" rx="9" ry="6" fill="rgba(255,255,255,0.7)" transform="rotate(-15,908,124)"/>
+  <!-- Lettuce -->
+  <path d="M748 162 Q780 152 815 162 Q850 152 885 162 Q920 152 955 162 Q975 152 992 162 L992 175 L748 175Z" fill="#16a34a"/>
+  <!-- Tomato -->
+  <rect x="748" y="175" width="244" height="18" rx="5" fill="#dc2626" opacity="0.9"/>
+  <!-- Cheese -->
+  <path d="M745 193 L995 193 L1005 205 L738 205Z" fill="#fbbf24"/>
+  <!-- Patty -->
+  <rect x="745" y="205" width="250" height="40" rx="10" fill="#7c2d12"/>
+  <!-- Bun bottom -->
+  <ellipse cx="870" cy="258" rx="130" ry="25" fill="#d97706"/>
+  <!-- Steam lines -->
+  <path d="M850 100 Q855 80 848 60" stroke="#f97316" stroke-width="3" fill="none" stroke-linecap="round" opacity="0.5"/>
+  <path d="M870 95 Q875 72 868 50" stroke="#f97316" stroke-width="3" fill="none" stroke-linecap="round" opacity="0.4"/>
+  <path d="M892 100 Q897 78 890 58" stroke="#f97316" stroke-width="3" fill="none" stroke-linecap="round" opacity="0.5"/>
+  <!-- Tagline area -->
+  <rect x="220" y="320" width="360" height="4" rx="2" fill="rgba(249,115,22,0.4)"/>
+</svg>

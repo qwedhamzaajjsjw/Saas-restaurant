@@ -26,7 +26,7 @@
     @php
         $slides = [];
         if ($restaurant->cover_image)
-            $slides[] = ['img' => asset('storage/'.$restaurant->cover_image), 'title' => $restaurant->name, 'sub' => $restaurant->description ?? 'Fresh & Delicious Food'];
+            $slides[] = ['img' => $restaurant->cover_image_url, 'title' => $restaurant->name, 'sub' => $restaurant->description ?? 'Fresh & Delicious Food'];
         // Fill up to 3 slides with featured product images
         if ($showFeatured)
             foreach ($featured->take(3 - count($slides)) as $p)

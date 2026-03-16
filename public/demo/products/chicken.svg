@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#d97706"/>
+      <stop offset="100%" stop-color="#92400e"/>
+    </linearGradient>
+  </defs>
+  <rect width="400" height="300" fill="url(#bg)"/>
+  <circle cx="200" cy="150" r="120" fill="rgba(255,255,255,0.07)"/>
+  <!-- Bun top -->
+  <ellipse cx="200" cy="118" rx="90" ry="40" fill="#b45309"/>
+  <ellipse cx="200" cy="98" rx="85" ry="28" fill="#d97706"/>
+  <!-- Sesame seeds -->
+  <ellipse cx="178" cy="92" rx="6" ry="4" fill="rgba(255,255,255,0.6)" transform="rotate(-20,178,92)"/>
+  <ellipse cx="208" cy="88" rx="6" ry="4" fill="rgba(255,255,255,0.6)" transform="rotate(10,208,88)"/>
+  <ellipse cx="232" cy="95" rx="6" ry="4" fill="rgba(255,255,255,0.6)" transform="rotate(-15,232,95)"/>
+  <!-- Lettuce -->
+  <path d="M108 140 Q130 130 155 140 Q180 130 205 140 Q230 130 255 140 Q278 130 292 140 L292 153 L108 153Z" fill="#16a34a"/>
+  <!-- Crispy chicken patty -->
+  <ellipse cx="200" cy="175" rx="88" ry="30" fill="#92400e"/>
+  <path d="M115 162 Q130 155 150 163 Q170 155 190 163 Q210 155 230 163 Q250 155 270 162 Q285 155 287 162 L285 188 Q270 182 250 188 Q230 182 210 188 Q190 182 170 188 Q150 182 130 188 Q115 182 115 188Z" fill="#c2410c" opacity="0.9"/>
+  <!-- Crispy texture dots -->
+  <circle cx="155" cy="170" r="4" fill="rgba(255,200,0,0.5)"/>
+  <circle cx="180" cy="165" r="3" fill="rgba(255,200,0,0.5)"/>
+  <circle cx="215" cy="172" r="4" fill="rgba(255,200,0,0.5)"/>
+  <circle cx="245" cy="167" r="3" fill="rgba(255,200,0,0.5)"/>
+  <!-- Bun bottom -->
+  <ellipse cx="200" cy="212" rx="95" ry="18" fill="#d97706"/>
+  <ellipse cx="200" cy="217" rx="100" ry="12" fill="#b45309"/>
+</svg>

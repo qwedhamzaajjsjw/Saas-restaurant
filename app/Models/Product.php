@@ -85,6 +85,9 @@ class Product extends Model
         if (str_starts_with($this->image, 'http')) {
             return $this->image;
         }
+        if (str_starts_with($this->image, 'demo/')) {
+            return asset($this->image);
+        }
         return asset('storage/'.$this->image);
     }
 

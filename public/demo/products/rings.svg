@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#b45309"/>
+      <stop offset="100%" stop-color="#78350f"/>
+    </linearGradient>
+  </defs>
+  <rect width="400" height="300" fill="url(#bg)"/>
+  <circle cx="200" cy="150" r="120" fill="rgba(255,255,255,0.07)"/>
+  <!-- Basket/box -->
+  <path d="M130 220 L140 260 L260 260 L270 220Z" fill="#dc2626"/>
+  <rect x="128" y="214" width="144" height="12" rx="6" fill="#b91c1c"/>
+  <!-- Basket pattern -->
+  <line x1="160" y1="216" x2="155" y2="260" stroke="rgba(255,255,255,0.15)" stroke-width="2"/>
+  <line x1="200" y1="216" x2="200" y2="260" stroke="rgba(255,255,255,0.15)" stroke-width="2"/>
+  <line x1="240" y1="216" x2="245" y2="260" stroke="rgba(255,255,255,0.15)" stroke-width="2"/>
+  <!-- Onion Ring 1 (large, back) -->
+  <ellipse cx="200" cy="185" rx="70" ry="30" fill="#d97706" opacity="0.9"/>
+  <ellipse cx="200" cy="185" rx="55" ry="20" fill="#b45309"/>
+  <ellipse cx="200" cy="185" rx="42" ry="14" fill="#d97706" opacity="0.9"/>
+  <!-- Onion Ring 2 (medium, middle) -->
+  <ellipse cx="195" cy="155" rx="58" ry="25" fill="#f59e0b"/>
+  <ellipse cx="195" cy="155" rx="44" ry="17" fill="#d97706"/>
+  <ellipse cx="195" cy="155" rx="32" ry="11" fill="#f59e0b"/>
+  <!-- Onion Ring 3 (small, front) -->
+  <ellipse cx="205" cy="128" rx="48" ry="21" fill="#fbbf24"/>
+  <ellipse cx="205" cy="128" rx="35" ry="14" fill="#f59e0b"/>
+  <ellipse cx="205" cy="128" rx="24" ry="9" fill="#fbbf24"/>
+  <!-- Crispy texture -->
+  <circle cx="155" cy="183" r="4" fill="#92400e" opacity="0.5"/>
+  <circle cx="245" cy="187" r="3" fill="#92400e" opacity="0.5"/>
+  <circle cx="165" cy="153" r="3" fill="#92400e" opacity="0.5"/>
+  <circle cx="235" cy="157" r="4" fill="#92400e" opacity="0.5"/>
+  <!-- Dipping sauce -->
+  <ellipse cx="310" cy="200" rx="38" ry="18" fill="#fbbf24" opacity="0.9"/>
+  <ellipse cx="310" cy="196" rx="32" ry="14" fill="#f59e0b"/>
+</svg>

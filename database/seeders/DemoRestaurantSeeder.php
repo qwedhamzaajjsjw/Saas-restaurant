@@ -15,26 +15,36 @@ use Illuminate\Support\Str;
 
 class DemoRestaurantSeeder extends Seeder
 {
+    private const SLUG = 'burger-house-demo';
+
     public function run(): void
     {
-        // ── Find or use Pro plan ──────────────────────────────────────────
+        // ── Find a plan ───────────────────────────────────────────────────
         $plan = Plan::where('name', 'Pro')->first() ?? Plan::first();
-        if (!$plan) return;
-
-        // ── Create Demo Restaurant ────────────────────────────────────────
-        $slug = 'burger-house-demo';
-
-        if (Restaurant::where('slug', $slug)->exists()) {
-            $this->command->info('Demo restaurant already exists, skipping.');
+        if (!$plan) {
+            $this->command->error('No plans found. Please create a plan first.');
             return;
         }
 
+        // ── Clean up any previous demo data ──────────────────────────────
+        $existing = Restaurant::withTrashed()->where('slug', self::SLUG)->first();
+        if ($existing) {
+            $this->command->info('Removing old demo data...');
+            Product::withoutGlobalScopes()->where('restaurant_id', $existing->id)->forceDelete();
+            Category::withoutGlobalScopes()->where('restaurant_id', $existing->id)->forceDelete();
+            Menu::withoutGlobalScopes()->where('restaurant_id', $existing->id)->forceDelete();
+            Subscription::where('restaurant_id', $existing->id)->delete();
+            User::where('restaurant_id', $existing->id)->forceDelete();
+            $existing->forceDelete();
+        }
+
+        // ── Create Demo Restaurant ────────────────────────────────────────
         $restaurant = Restaurant::create([
             'name'          => 'Burger House',
-            'slug'          => $slug,
+            'slug'          => self::SLUG,
             'description'   => 'Serving the juiciest burgers in town since 2010. Fresh ingredients, bold flavors, and unforgettable taste.',
-            'logo'          => null,
-            'cover_image'   => null,
+            'logo'          => 'demo/logo.svg',
+            'cover_image'   => 'demo/cover.svg',
             'primary_color' => '#f97316',
             'phone'         => '+1 (555) 123-4567',
             'email'         => 'hello@burgerhouse.demo',
@@ -78,7 +88,7 @@ class DemoRestaurantSeeder extends Seeder
             'sort_order'    => 0,
         ]);
 
-        // ── Extras (reusable option sets) ─────────────────────────────────
+        // ── Common option sets ────────────────────────────────────────────
         $burgerExtras = [
             ['name' => 'Extra Cheese',  'price' => 1.00],
             ['name' => 'Double Patty',  'price' => 2.50],
@@ -118,7 +128,7 @@ class DemoRestaurantSeeder extends Seeder
                 'description' => 'Double smash patties, cheddar cheese, lettuce, tomato, pickles, and our secret sauce.',
                 'price'       => 12.99,
                 'sale_price'  => null,
-                'image'       => 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=400&h=400&fit=crop',
+                'image'       => 'demo/products/burger.svg',
                 'is_featured' => true,
                 'options'     => array_merge($burgerExtras, $sauceExtras),
             ],
@@ -127,17 +137,8 @@ class DemoRestaurantSeeder extends Seeder
                 'description' => 'Smoky BBQ sauce, crispy bacon, caramelized onions, and pepper jack cheese.',
                 'price'       => 14.99,
                 'sale_price'  => 11.99,
-                'image'       => 'https://images.unsplash.com/photo-1553979459-d2229ba7433b?w=400&h=400&fit=crop',
+                'image'       => 'demo/products/burger.svg',
                 'is_featured' => true,
-                'options'     => array_merge($burgerExtras, $sauceExtras),
-            ],
-            [
-                'name'        => 'Mushroom Swiss Burger',
-                'description' => 'Sautéed mushrooms, Swiss cheese, garlic aioli, arugula on a brioche bun.',
-                'price'       => 13.99,
-                'sale_price'  => null,
-                'image'       => 'https://images.unsplash.com/photo-1565299507177-b0ac66763828?w=400&h=400&fit=crop',
-                'is_featured' => false,
                 'options'     => array_merge($burgerExtras, $sauceExtras),
             ],
             [
@@ -145,16 +146,25 @@ class DemoRestaurantSeeder extends Seeder
                 'description' => 'Crispy fried chicken thigh, spicy slaw, pickled jalapeños, sriracha mayo.',
                 'price'       => 13.49,
                 'sale_price'  => null,
-                'image'       => 'https://images.unsplash.com/photo-1606755962773-d324e0a13086?w=400&h=400&fit=crop',
+                'image'       => 'demo/products/chicken.svg',
                 'is_featured' => true,
                 'options'     => $sauceExtras,
+            ],
+            [
+                'name'        => 'Mushroom Swiss Burger',
+                'description' => 'Sautéed mushrooms, Swiss cheese, garlic aioli, arugula on a brioche bun.',
+                'price'       => 13.99,
+                'sale_price'  => null,
+                'image'       => 'demo/products/burger.svg',
+                'is_featured' => false,
+                'options'     => array_merge($burgerExtras, $sauceExtras),
             ],
             [
                 'name'        => 'Veggie Bean Burger',
                 'description' => 'Black bean & quinoa patty, guacamole, roasted red pepper, sprouts.',
                 'price'       => 11.99,
                 'sale_price'  => 9.99,
-                'image'       => 'https://images.unsplash.com/photo-1520072959219-c595dc870360?w=400&h=400&fit=crop',
+                'image'       => 'demo/products/burger.svg',
                 'is_featured' => false,
                 'options'     => $sauceExtras,
             ],
@@ -163,7 +173,7 @@ class DemoRestaurantSeeder extends Seeder
                 'description' => 'Triple patty tower with bacon, egg, cheese, and all the toppings.',
                 'price'       => 18.99,
                 'sale_price'  => null,
-                'image'       => 'https://images.unsplash.com/photo-1561758033-d89a9ad46330?w=400&h=400&fit=crop',
+                'image'       => 'demo/products/burger.svg',
                 'is_featured' => false,
                 'options'     => $burgerExtras,
             ],
@@ -205,7 +215,7 @@ class DemoRestaurantSeeder extends Seeder
                 'description' => 'Crispy fries topped with cheddar sauce, bacon bits, sour cream, and chives.',
                 'price'       => 7.99,
                 'sale_price'  => 5.99,
-                'image'       => 'https://images.unsplash.com/photo-1573080496219-bb080dd4f877?w=400&h=400&fit=crop',
+                'image'       => 'demo/products/fries.svg',
                 'is_featured' => true,
                 'options'     => [['name'=>'Extra Cheese Sauce','price'=>1.00],['name'=>'Add Jalapeños','price'=>0.50]],
             ],
@@ -214,34 +224,25 @@ class DemoRestaurantSeeder extends Seeder
                 'description' => 'Golden battered onion rings served with ranch dipping sauce.',
                 'price'       => 5.99,
                 'sale_price'  => null,
-                'image'       => 'https://images.unsplash.com/photo-1639024471283-03518883512d?w=400&h=400&fit=crop',
+                'image'       => 'demo/products/rings.svg',
                 'is_featured' => false,
                 'options'     => $sauceExtras,
             ],
             [
-                'name'        => 'Chicken Wings (6pc)',
-                'description' => 'Crispy wings tossed in your choice of buffalo, BBQ, or honey garlic sauce.',
+                'name'        => 'Crispy Chicken Nuggets',
+                'description' => 'Bite-sized crispy chicken nuggets served with your choice of dipping sauce.',
                 'price'       => 10.99,
                 'sale_price'  => null,
-                'image'       => 'https://images.unsplash.com/photo-1608039755401-742074f0548d?w=400&h=400&fit=crop',
+                'image'       => 'demo/products/nuggets.svg',
                 'is_featured' => false,
-                'options'     => [['name'=>'Buffalo Sauce','price'=>0],['name'=>'BBQ Sauce','price'=>0],['name'=>'Honey Garlic','price'=>0],['name'=>'Extra Sauce','price'=>0.50]],
+                'options'     => [['name'=>'BBQ Sauce','price'=>0],['name'=>'Honey Mustard','price'=>0],['name'=>'Ranch','price'=>0],['name'=>'Extra Sauce','price'=>0.50]],
             ],
             [
                 'name'        => 'Sweet Potato Fries',
                 'description' => 'Seasoned sweet potato fries with chipotle mayo dip.',
                 'price'       => 6.49,
                 'sale_price'  => null,
-                'image'       => 'https://images.unsplash.com/photo-1574894709920-11b28e7367e3?w=400&h=400&fit=crop',
-                'is_featured' => false,
-                'options'     => [],
-            ],
-            [
-                'name'        => 'Mac & Cheese Bites',
-                'description' => 'Crispy fried mac and cheese bites, golden and gooey inside.',
-                'price'       => 7.49,
-                'sale_price'  => 5.99,
-                'image'       => 'https://images.unsplash.com/photo-1543352634-a1c51d9f1fa7?w=400&h=400&fit=crop',
+                'image'       => 'demo/products/fries.svg',
                 'is_featured' => false,
                 'options'     => [],
             ],
@@ -283,16 +284,16 @@ class DemoRestaurantSeeder extends Seeder
                 'description' => 'Thick and creamy shake. Choose from vanilla, chocolate, or strawberry.',
                 'price'       => 6.99,
                 'sale_price'  => null,
-                'image'       => 'https://images.unsplash.com/photo-1572490122747-3968b75cc699?w=400&h=400&fit=crop',
+                'image'       => 'demo/products/shake.svg',
                 'is_featured' => true,
                 'options'     => [['name'=>'Vanilla','price'=>0],['name'=>'Chocolate','price'=>0],['name'=>'Strawberry','price'=>0],['name'=>'Whipped Cream','price'=>0.50]],
             ],
             [
-                'name'        => 'Fresh Lemonade',
-                'description' => 'Freshly squeezed lemonade with mint and a pinch of sea salt.',
+                'name'        => 'Fresh Orange Juice',
+                'description' => 'Freshly squeezed orange juice, served cold with ice.',
                 'price'       => 4.49,
                 'sale_price'  => 3.49,
-                'image'       => 'https://images.unsplash.com/photo-1621263764928-df1444c5e859?w=400&h=400&fit=crop',
+                'image'       => 'demo/products/juice.svg',
                 'is_featured' => false,
                 'options'     => $drinkExtras,
             ],
@@ -301,18 +302,9 @@ class DemoRestaurantSeeder extends Seeder
                 'description' => 'House-made craft sodas in rotating seasonal flavors.',
                 'price'       => 3.99,
                 'sale_price'  => null,
-                'image'       => 'https://images.unsplash.com/photo-1527960471264-932f39eb5846?w=400&h=400&fit=crop',
+                'image'       => 'demo/products/soda.svg',
                 'is_featured' => false,
                 'options'     => $drinkExtras,
-            ],
-            [
-                'name'        => 'Iced Coffee',
-                'description' => 'Cold brew iced coffee with your choice of milk.',
-                'price'       => 4.99,
-                'sale_price'  => null,
-                'image'       => 'https://images.unsplash.com/photo-1461023058943-07fcbe16d735?w=400&h=400&fit=crop',
-                'is_featured' => false,
-                'options'     => [['name'=>'Oat Milk','price'=>0.50],['name'=>'Extra Shot','price'=>1.00],['name'=>'Sugar-free Syrup','price'=>0]],
             ],
         ];
 
@@ -348,31 +340,22 @@ class DemoRestaurantSeeder extends Seeder
 
         $desserts = [
             [
-                'name'        => 'Brownie Sundae',
-                'description' => 'Warm chocolate brownie, vanilla ice cream, hot fudge, whipped cream, cherry on top.',
+                'name'        => 'Ice Cream Sundae',
+                'description' => 'Three scoops of premium ice cream with hot fudge, whipped cream, and a cherry.',
                 'price'       => 7.99,
                 'sale_price'  => null,
-                'image'       => 'https://images.unsplash.com/photo-1564355808539-22fda35bed7e?w=400&h=400&fit=crop',
+                'image'       => 'demo/products/icecream.svg',
                 'is_featured' => true,
-                'options'     => [['name'=>'Extra Fudge','price'=>0.50],['name'=>'No Ice Cream','price'=>-1.00]],
+                'options'     => [['name'=>'Extra Fudge','price'=>0.50],['name'=>'Sprinkles','price'=>0]],
             ],
             [
-                'name'        => 'NY Style Cheesecake',
-                'description' => 'Rich and creamy New York cheesecake with strawberry compote.',
+                'name'        => 'Birthday Cake Slice',
+                'description' => 'Moist layered cake with buttercream frosting and colorful sprinkles.',
                 'price'       => 6.99,
                 'sale_price'  => 5.49,
-                'image'       => 'https://images.unsplash.com/photo-1565958011703-44f9829ba187?w=400&h=400&fit=crop',
+                'image'       => 'demo/products/cake.svg',
                 'is_featured' => false,
-                'options'     => [['name'=>'Strawberry Topping','price'=>0],['name'=>'Blueberry Topping','price'=>0],['name'=>'Caramel Drizzle','price'=>0.50]],
-            ],
-            [
-                'name'        => 'Churros & Chocolate',
-                'description' => 'Crispy cinnamon churros served with warm Belgian chocolate dipping sauce.',
-                'price'       => 5.99,
-                'sale_price'  => null,
-                'image'       => 'https://images.unsplash.com/photo-1624374053855-39a5a872c52f?w=400&h=400&fit=crop',
-                'is_featured' => false,
-                'options'     => [['name'=>'Extra Chocolate','price'=>0.75]],
+                'options'     => [['name'=>'Chocolate','price'=>0],['name'=>'Vanilla','price'=>0],['name'=>'Red Velvet','price'=>0]],
             ],
         ];
 
@@ -395,7 +378,7 @@ class DemoRestaurantSeeder extends Seeder
         }
 
         $this->command->info('✅ Demo restaurant "Burger House" created successfully!');
-        $this->command->info('   Storefront URL : '.url('/restaurant/'.$slug));
+        $this->command->info('   Storefront URL : '.url('/restaurant/'.self::SLUG));
         $this->command->info('   Owner login    : owner@burgerhouse.demo / Demo@123456');
     }
 }

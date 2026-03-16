@@ -1,12 +1,24 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Auth\ImpersonationController;
 
 /*
 |--------------------------------------------------------------------------
 | Web Routes
 |--------------------------------------------------------------------------
 */
+
+// ── Impersonation (no role middleware — user is being switched) ───────────
+Route::middleware(['auth', 'installed'])->group(function () {
+    // Super admin → restaurant owner (requires auth as super_admin, validated inside controller)
+    Route::get('/auth/restaurant-switch/{token}', [ImpersonationController::class, 'switchToRestaurant'])
+         ->name('auth.restaurant-switch');
+
+    // Restaurant owner → back to super admin
+    Route::get('/auth/admin-return', [ImpersonationController::class, 'returnToAdmin'])
+         ->name('auth.admin-return');
+});
 
 // ── Installer ────────────────────────────────────────────────────────────
 require __DIR__.'/installer.php';
