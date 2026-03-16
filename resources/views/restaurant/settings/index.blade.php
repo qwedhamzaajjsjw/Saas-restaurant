@@ -58,6 +58,22 @@
                     <textarea name="description" rows="3"
                               class="w-full border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400">{{ old('description', $restaurant->description) }}</textarea>
                 </div>
+                {{-- Custom Domain --}}
+                <div class="col-span-2">
+                    <label class="block text-sm font-medium text-gray-700 mb-1.5">Custom Domain</label>
+                    <input type="text" name="custom_domain"
+                           value="{{ old('custom_domain', $restaurant->custom_domain) }}"
+                           placeholder="e.g. pizza-palace.com"
+                           class="w-full border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400">
+                    <p class="text-xs text-gray-400 mt-1">
+                        Point your domain's DNS (A record) to this server's IP, then enter the domain here.
+                        @if($restaurant->custom_domain)
+                            <a href="http://{{ $restaurant->custom_domain }}" target="_blank"
+                               class="text-orange-500 hover:underline ml-1">Visit → {{ $restaurant->custom_domain }}</a>
+                        @endif
+                    </p>
+                </div>
+
                 <div class="col-span-2">
                     <label class="flex items-center gap-3 cursor-pointer p-4 rounded-xl border border-gray-200 hover:bg-gray-50 transition">
                         <input type="checkbox" name="accepts_orders" value="1"

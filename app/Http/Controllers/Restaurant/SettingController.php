@@ -29,6 +29,12 @@ class SettingController extends Controller
             'accepts_orders' => ['boolean'],
             'timezone'       => ['nullable', 'string'],
             'logo'           => ['nullable', 'image', 'max:2048'],
+            'custom_domain'  => [
+                'nullable', 'string', 'max:253',
+                'regex:/^([a-z0-9]+(-[a-z0-9]+)*\.)+[a-z]{2,}$/i',
+                \Illuminate\Validation\Rule::unique('restaurants', 'custom_domain')
+                    ->ignore($restaurant->id),
+            ],
         ]);
 
         $data['accepts_orders'] = $request->boolean('accepts_orders', true);

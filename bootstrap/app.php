@@ -9,6 +9,12 @@ return Application::configure(basePath: dirname(__DIR__))
         web: __DIR__.'/../routes/web.php',
         commands: __DIR__.'/../routes/console.php',
         health: '/up',
+        then: function () {
+            // Custom domain storefront – loaded for every request;
+            // CustomDomainMiddleware decides whether the host matches.
+            \Illuminate\Support\Facades\Route::middleware('web')
+                ->group(base_path('routes/custom_domain.php'));
+        },
     )
     ->withMiddleware(function (Middleware $middleware): void {
 
@@ -24,6 +30,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'tenant'       => \App\Http\Middleware\TenantMiddleware::class,
             'installed'    => \App\Http\Middleware\CheckInstalled::class,
             'subscription' => \App\Http\Middleware\CheckSubscription::class,
+            'custom.domain' => \App\Http\Middleware\CustomDomainMiddleware::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
